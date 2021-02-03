@@ -1,7 +1,6 @@
-import random
-
 from core.structure.structure import Structure
 
 
 def simulate(structure: Structure) -> float:
-    return random.random()
+    flow = sum([poly.length for poly in structure.polygons])
+    return flow

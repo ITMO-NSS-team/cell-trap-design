@@ -22,6 +22,8 @@ class GA:
         self.visualiser = visualiser
         self.greedy_heuristic = greedy_heuristic
 
+        self.generation_number = 0
+
     def __init_operators(self):
         self.init_population = self.operators.init_population
         self.crossover = self.operators.crossover
@@ -68,6 +70,7 @@ class GA:
         for _ in range(self.params.pop_size):
             group = self.random_selection(group_size)
             best = min(group, key=lambda ind: ind.fitness)
+            best.generation_number = self.generation_number
             chosen.append(best)
 
         return chosen
@@ -83,6 +86,7 @@ class GA:
             child_gen = self.crossover(p1.genotype, p2.genotype, self.params.crossover_rate)
             child_gen = self.mutation(child_gen, self.params.mutation_rate)
             child = GA.Individ(genotype=child_gen)
+            child.generation_number = self.generation_number
             children.append(child)
 
         return children

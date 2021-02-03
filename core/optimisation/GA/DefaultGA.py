@@ -15,14 +15,16 @@ class DefaultGA(GA):
             # if self.visualiser is not None:
             #    self.visualiser.state = VisualiserState(self.generation_number)
 
-            for individ in self._pop:
-                individ.population_number = self.generation_number
-
             selected = self.tournament_selection()
 
             self._pop.extend(self.reproduce(selected))
 
+            for individ in self._pop:
+                individ.population_number = self.generation_number
+
             self.fitness()
+
+            self._pop = sorted(self._pop, key=lambda x: x.fitness)[0:self.params.pop_size]
 
             self.generation_number += 1
 

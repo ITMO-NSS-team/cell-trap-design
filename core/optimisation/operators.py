@@ -39,7 +39,7 @@ def crossover(s1: Structure, s2: Structure, rate=0.4):
 def mutation(structure: Structure, rate=0.6):
     random_val = random.random()
 
-    if random_val > - rate:
+    if random_val > rate:
         return structure
 
     is_correct = False
@@ -47,8 +47,8 @@ def mutation(structure: Structure, rate=0.6):
     while not is_correct:
         new_structure = copy.deepcopy(structure)
 
-        polygon_to_mutate = new_structure.polygons[random.randint(len(new_structure.polygons))]
-        point_to_mutate = new_structure.polygons[random.randint(len(polygon_to_mutate.points))]
+        polygon_to_mutate = new_structure.polygons[random.randint(0, len(new_structure.polygons) - 1)]
+        point_to_mutate = polygon_to_mutate.points[random.randint(0, len(polygon_to_mutate.points) - 1)]
 
         params = [2, 0.5, 1]
 
