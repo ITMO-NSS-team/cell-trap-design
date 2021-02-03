@@ -16,6 +16,9 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import matplotlib.pyplot as plt
 from core.utils import project_root
+from core.utils import GlobalEnv
+
+global_env = GlobalEnv
 
 
 def poly_add(model, polygons):
@@ -53,14 +56,20 @@ def execute(structure: Structure, with_vizualization=True) -> float:
         model.mesh()
         model.solve()
 
-        target = model.evaluate('vlct_main')
+        target = float(1 / 5 * (
+                model.evaluate('vlct_1') +
+                model.evaluate('vlct_2') +
+                model.evaluate('vlct_3') +
+                model.evaluate('vlct_4') +
+                model.evaluate('vlct_5')))
+
         _save_simulation_result(structure, float(target))
 
         if with_vizualization:
             x = model.evaluate('x')
             y = model.evaluate('y')
             U = model.evaluate('spf.U')
-
+            plt.title(round(target, 6))
             plt.scatter(x, y, c=U, cmap=plt.cm.coolwarm)
             plt.show()
 

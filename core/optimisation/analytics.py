@@ -41,8 +41,8 @@ class EvoAnalytics:
 
         writer = csv.writer(f, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(
-            [pop_num, referenced_dataset, ','.join([str(round(_, 1)) for _ in objs]),
-             ','.join([str(round(_, 1)) for _ in analytics_objectives]), local_id])
+            [pop_num, referenced_dataset, ','.join([str(round(_, 6)) for _ in objs]),
+             ','.join([str(round(_, 6)) for _ in analytics_objectives]), local_id])
 
     @staticmethod
     def _write_header_to_csv(f, objectives, analytics_objectives, genotype):
