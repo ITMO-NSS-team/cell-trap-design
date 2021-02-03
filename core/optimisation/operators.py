@@ -4,7 +4,9 @@ import random
 import numpy as np
 
 from core.optimisation.constraints import check_constraints
-from core.structure.structure import get_random_structure, Structure
+from core.structure.structure import (get_random_structure,
+                                      get_random_poly,
+                                      Structure)
 from core.utils import GlobalEnv
 
 
@@ -47,7 +49,9 @@ def mutation(structure: Structure, rate):
     is_correct = False
 
     polygon_drop_mutation_prob = 0.3
+    polygon_add_mutation_prob = 0.3
     point_drop_mutation_prob = 0.3
+    point_add_mutation_prob = 0.3
 
     while not is_correct:
         is_correct = True
@@ -58,16 +62,21 @@ def mutation(structure: Structure, rate):
         if random.random() < polygon_drop_mutation_prob and len(new_structure.polygons) > 1:
             # if drop polygon from structure
             new_structure.polygons.remove(polygon_to_mutate)
+        elif random.random() < polygon_add_mutation_prob:
+            # if drop polygon from structure
+            new_structure.polygons.append(get_random_poly())
         else:
             point_to_mutate = polygon_to_mutate.points[random.randint(0, len(polygon_to_mutate.points) - 1)]
             if random.random() < point_drop_mutation_prob and len(polygon_to_mutate.points) > 3:
                 # if drop point from polygon
                 polygon_to_mutate.points.remove(point_to_mutate)
+            # elif random.random() < polygon_add_mutation_prob:
+            # polygon_to_mutate.points.append(Poly())
             else:
                 # if chage point in polygon
 
                 domain = GlobalEnv.domain
-                params = [domain.len_x * 0.1, domain.len_x * 0.05]
+                params = [domain.len_x * 0.05, domain.len_x * 0.025]
 
                 mutation_ratio_x = abs(np.random.normal(params[0], params[1], 1)[0])
                 mutation_ratio_y = abs(np.random.normal(params[0], params[1], 1)[0])
@@ -88,7 +97,7 @@ def initial_pop_random(size: int):
 
     for _ in range(0, size):
         while len(population_new) < size:
-            structure = get_random_structure()
+            structure = get_random_structure(max_pols_num=4, max_pol_size=6)
             is_correct = check_constraints(structure)
             if is_correct:
                 population_new.append(structure)

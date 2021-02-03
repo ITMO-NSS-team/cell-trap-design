@@ -1,5 +1,5 @@
 from core.optimisation.GA.GA import GA
-
+from core.optimisation.analytics import EvoAnalytics
 
 class DefaultGA(GA):
 
@@ -28,5 +28,6 @@ class DefaultGA(GA):
             best = sorted(self._pop, key=lambda x: x.fitness)[0]
             print(f'Best fitness is {best.fitness}')
             self.generation_number += 1
+            EvoAnalytics.create_boxplot()
 
         return self._pop, best

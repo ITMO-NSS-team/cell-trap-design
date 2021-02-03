@@ -27,16 +27,21 @@ def get_random_structure(max_pols_num=4, max_pol_size=8) -> Structure:
 
     num_pols = randint(1, max_pols_num)
 
-    domain = GlobalEnv.domain
-
     for _ in range(num_pols):
-        polygon = Polygon(polygon_id=str(uuid4), points=[])
-        num_points = randint(3, max_pol_size)
-
-        for _ in range(num_points):
-            point = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
-                                 np.random.uniform(low=domain.min_y, high=domain.max_y))
-            polygon.points.append(point)
+        polygon = get_random_poly()
         structure.polygons.append(polygon)
 
     return structure
+
+
+def get_random_poly(max_pol_size=8):
+    domain = GlobalEnv.domain
+
+    polygon = Polygon(polygon_id=str(uuid4), points=[])
+    num_points = randint(3, max_pol_size)
+
+    for _ in range(num_points):
+        point = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
+                             np.random.uniform(low=domain.min_y, high=domain.max_y))
+        polygon.points.append(point)
+    return polygon

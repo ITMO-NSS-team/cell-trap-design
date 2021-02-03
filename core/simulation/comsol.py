@@ -2,7 +2,7 @@
 # """
 # Created on Wed Feb  3 12:49:07 2021
 import os
-from multiprocessing import Lock
+from typing import List
 
 import pickledb
 
@@ -33,65 +33,78 @@ def poly_add(model, polygons):
 
 
 def execute(structure: Structure, with_vizualization=True) -> float:
-    saved_result = _load_simulation_result(structure)
-    if saved_result is not None:
-        target = saved_result
-    else:
-        client = GlobalEnv.comsol_client
+    try:
+        saved_result = _load_simulation_result(structure)
+        if saved_result is not None:
+            speeds = saved_result
+        else:
+            client = GlobalEnv.comsol_client
 
-        poly_box = []
+            poly_box = []
 
-        for i, pol in enumerate(structure.polygons):
-            poly_repr = []
-            # for j, pt in enumerate(pol.points):
-            poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
-            poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
-            poly_box.append(poly_repr)
+            for i, pol in enumerate(structure.polygons):
+                poly_repr = []
+                # for j, pt in enumerate(pol.points):
+                poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
+                poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
+                poly_box.append(poly_repr)
 
-        model = client.load(f'{project_root()}/comsol/Comsol2pics.mph')
+            model = client.load(f'{project_root()}/comsol/Comsol2pics.mph')
 
-        model = poly_add(model, poly_box)
+            model = poly_add(model, poly_box)
 
-        model.build()
-        model.mesh()
-        model.solve()
+            model.build()
+            model.mesh()
+            model.solve()
 
-        target = float(1 / 5 * (
-                model.evaluate('vlct_1') +
-                model.evaluate('vlct_2') +
-                model.evaluate('vlct_3') +
-                model.evaluate('vlct_4') +
-                model.evaluate('vlct_5')))
+            speeds = [model.evaluate('vlct_1'),
+                      model.evaluate('vlct_2'),
+                      model.evaluate('vlct_3'),
+                      model.evaluate('vlct_4'),
+                      model.evaluate('vlct_5'),
+                      model.evaluate('vlct_side'),
+                      model.evaluate('vlct_main')]
 
-        _save_simulation_result(structure, float(target))
+            speeds = [float(_) for _ in speeds]
 
-        if with_vizualization:
-            x = model.evaluate('x')
-            y = model.evaluate('y')
-            U = model.evaluate('spf.U')
-            plt.title(round(target, 6))
-            plt.scatter(x, y, c=U, cmap=plt.cm.coolwarm)
-            plt.show()
+            _save_simulation_result(structure, speeds)
 
-    return float(target)
+            target = float(sum(speeds[0:5])) / float(sum(speeds[5:7]))
+
+            if with_vizualization:
+                x = model.evaluate('x')
+                y = model.evaluate('y')
+                U = model.evaluate('spf.U')
+                plt.title(round(target, 6))
+                plt.scatter(x, y, c=U, cmap=plt.cm.coolwarm,
+                            vmin=0, vmax=0.003)
+                # plt.colorbar()
+                # plt.show()
+                plt.savefig(f'./tmp/{target}.png')
+
+        target = float(sum(speeds[0:5])) / float(sum(speeds[5:7]))
+        print(target, [round(_, 5) for _ in speeds])
+    except RuntimeError as ex:
+        target = 0
+
+    return target
 
 
-def _save_simulation_result(configuration, target: float):
-    lock = Lock()
-    lock.acquire()
-
+def _save_simulation_result(configuration, target: List[float]):
     db = pickledb.load('comsol_db.saved', False)
-    db.set(str(configuration), target)
+    db.set(str(configuration), ' '.join([str(_) for _ in target]))
     db.dump()
 
 
 def _load_simulation_result(configuration):
     db = pickledb.load('comsol_db.saved', False)
 
-    target = db.get(str(configuration))
+    target_str = db.get(str(configuration))
 
-    if target is False:
+    if target_str is False:
         return None
+
+    target = [float(_) for _ in target_str.split(' ')]
 
     return target
 
