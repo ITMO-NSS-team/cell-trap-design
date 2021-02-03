@@ -20,7 +20,6 @@ class Polygon(object):
 
     @property
     def length(self):
-        assert len(self.points) > 2
         total_length = 0
         for i in range(1, len(self.points)):
             total_length += sqrt(

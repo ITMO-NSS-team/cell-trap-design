@@ -8,7 +8,7 @@ class DefaultGA(GA):
         self.generation_number = 0
 
         self.fitness()
-
+        best = None
         while self.generation_number <= self.params.max_gens:
             print(f'Generation {self.generation_number}')
 
@@ -25,8 +25,8 @@ class DefaultGA(GA):
             self.fitness()
 
             self._pop = sorted(self._pop, key=lambda x: x.fitness)[0:self.params.pop_size]
-
+            best = sorted(self._pop, key=lambda x: x.fitness)[0]
+            print(f'Best fitness is {best.fitness}')
             self.generation_number += 1
 
-        best = sorted(self._pop, key=lambda x: x.fitness)[0]
         return self._pop, best
