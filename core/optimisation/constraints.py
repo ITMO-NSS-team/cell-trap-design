@@ -1,4 +1,5 @@
-from shapely.geometry import Polygon as GeomPolygon, Point as GeomPoint
+from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
+from shapely.validation import explain_validity
 
 from core.structure.polygon import Polygon
 from core.structure.structure import Structure
@@ -8,7 +9,7 @@ MIN_DIST = 15
 
 
 def check_constraints(structure: Structure) -> bool:
-    return not (_out_of_bound(structure) or _too_close(structure))
+    return not (_out_of_bound(structure) or _too_close(structure) or _self_intersection(structure))
 
 
 def _out_of_bound(structure: Structure) -> bool:
@@ -37,5 +38,9 @@ def _pairwise_dist(poly_1: Polygon, poly_2: Polygon):
 
     geom_poly_1 = GeomPolygon(pts1)
     geom_poly_2 = GeomPolygon(pts2)
-
     return geom_poly_1.distance(geom_poly_2)
+
+
+def _self_intersection(structure: Structure):
+    return any([explain_validity(GeomPolygon([GeomPoint(pt.x, pt.y) for pt in poly.points])) != 'Valid Geometry'
+                for poly in structure.polygons])

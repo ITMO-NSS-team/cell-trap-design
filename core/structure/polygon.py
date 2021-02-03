@@ -5,8 +5,24 @@ from typing import List
 
 @dataclass()
 class PolygonPoint:
-    x: float
-    y: float
+    _x: float
+    _y: float
+
+    @property
+    def x(self):
+        return round(self._x)
+
+    @x.setter
+    def x(self, value):
+        self._x = value
+
+    @property
+    def y(self):
+        return round(self._y)
+
+    @y.setter
+    def y(self, value):
+        self._y = value
 
 
 def xy_to_points(xy):
