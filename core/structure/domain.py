@@ -1,12 +1,21 @@
-from dataclasses import dataclass
-
-
-@dataclass
 class Domain:
-    min_x: float
-    max_x: float
-    min_y: float
-    max_y: float
+    allowed_area = [(-125, 100), (-75, 155), (15, 155), (30, 90), (-40, -50), (-40, -155), (-125, -155)]
+
+    @property
+    def min_x(self):
+        return min(p[0] for p in self.allowed_area)
+
+    @property
+    def max_x(self):
+        return max(p[0] for p in self.allowed_area)
+
+    @property
+    def min_y(self):
+        return min(p[1] for p in self.allowed_area)
+
+    @property
+    def max_y(self):
+        return max(p[1] for p in self.allowed_area)
 
     @property
     def len_x(self):

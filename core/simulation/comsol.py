@@ -79,12 +79,14 @@ def execute(structure: Structure, with_vizualization=True) -> float:
                 plt.scatter(x, y, c=U, cmap=plt.cm.coolwarm,
                             vmin=0, vmax=0.003)
                 # plt.colorbar()
-                # plt.show()
+                #plt.show()
                 plt.savefig(f'./tmp/{target}.png')
+                plt.clf()
 
         target = float(sum(speeds[0:5])) / float(sum(speeds[5:7]))
         print(target, [round(_, 5) for _ in speeds])
-    except RuntimeError as ex:
+    except Exception as ex:
+        print(ex)
         target = 0
 
     return target

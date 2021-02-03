@@ -4,9 +4,7 @@ import random
 import numpy as np
 
 from core.optimisation.constraints import check_constraints
-from core.structure.structure import (get_random_structure,
-                                      get_random_poly,
-                                      Structure)
+from core.structure.structure import (Structure, get_random_poly, get_random_structure)
 from core.utils import GlobalEnv
 
 
@@ -66,14 +64,13 @@ def mutation(structure: Structure, rate):
             # if drop polygon from structure
             new_structure.polygons.append(get_random_poly())
         else:
-            point_to_mutate = polygon_to_mutate.points[random.randint(0, len(polygon_to_mutate.points) - 1)]
+            mutate_point_ind = random.randint(0, len(polygon_to_mutate.points) - 1)
+            point_to_mutate = polygon_to_mutate.points[mutate_point_ind]
             if random.random() < point_drop_mutation_prob and len(polygon_to_mutate.points) > 3:
                 # if drop point from polygon
                 polygon_to_mutate.points.remove(point_to_mutate)
-            # elif random.random() < polygon_add_mutation_prob:
-            # polygon_to_mutate.points.append(Poly())
             else:
-                # if chage point in polygon
+                # if change point in polygon
 
                 domain = GlobalEnv.domain
                 params = [domain.len_x * 0.05, domain.len_x * 0.025]
@@ -83,10 +80,20 @@ def mutation(structure: Structure, rate):
 
                 sign = 1 if random.random() < 0.5 else -1
 
-                point_to_mutate.x += sign * mutation_ratio_x
-                point_to_mutate.x = round(abs(point_to_mutate.x))
-                point_to_mutate.y += sign * mutation_ratio_y
-                point_to_mutate.y = round(abs(point_to_mutate.y))
+                new_point = copy.deepcopy(point_to_mutate)
+                new_point.x += sign * mutation_ratio_x
+                new_point.x = round(abs(new_point.x))
+                new_point.y += sign * mutation_ratio_y
+                new_point.y = round(abs(new_point.y))
+
+                if random.random() < polygon_add_mutation_prob:
+                    if mutate_point_ind + 1 < len(polygon_to_mutate.points):
+                        polygon_to_mutate.points.insert(mutate_point_ind + 1, new_point)
+                    else:
+                        polygon_to_mutate.points.insert(mutate_point_ind - 1, new_point)
+                else:
+                    polygon_to_mutate.points[mutate_point_ind] = new_point
+
         is_correct = check_constraints(new_structure)
 
     return new_structure
@@ -97,7 +104,8 @@ def initial_pop_random(size: int):
 
     for _ in range(0, size):
         while len(population_new) < size:
-            structure = get_random_structure(max_pols_num=4, max_pol_size=6)
+            # TODO create around centroids
+            structure = get_random_structure(max_pols_num=5, max_pol_size=10)
             is_correct = check_constraints(structure)
             if is_correct:
                 population_new.append(structure)

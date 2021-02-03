@@ -13,13 +13,14 @@ def check_constraints(structure: Structure) -> bool:
 
 
 def _out_of_bound(structure: Structure) -> bool:
+    geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv.domain.allowed_area])
+
     for poly in structure.polygons:
         for pt in poly.points:
-            if (pt.x < GlobalEnv.domain.min_x or
-                    pt.x > GlobalEnv.domain.max_x or
-                    pt.y < GlobalEnv.domain.min_y or
-                    pt.y > GlobalEnv.domain.max_y):
+            geom_pt = GeomPoint(pt.x, pt.y)
+            if not geom_poly_allowed.contains(geom_pt):
                 return True
+
     return False
 
 

@@ -14,7 +14,7 @@ np.random.seed(42)
 
 EvoAnalytics.clear()
 
-domain = Domain(min_x=-125, max_x=25, min_y=-150, max_y=135)
+domain = Domain()
 
 GlobalEnv.domain = domain
 GlobalEnv.model_func = execute_comsol
