@@ -1,0 +1,2 @@
+class GlobalEnv:
+    domain = None
