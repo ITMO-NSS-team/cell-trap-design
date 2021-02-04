@@ -26,22 +26,30 @@ def get_random_structure(max_pols_num=4, max_pol_size=8) -> Structure:
     structure = Structure(polygons=[])
 
     num_pols = randint(1, max_pols_num)
+    is_large = num_pols == 1
 
     for _ in range(num_pols):
-        polygon = get_random_poly()
+        polygon = get_random_poly(max_pol_size, is_large=is_large)
         structure.polygons.append(polygon)
 
     return structure
 
 
-def get_random_poly(max_pol_size=8):
+def get_random_poly(max_pol_size=8, is_large=False):
     domain = GlobalEnv.domain
 
     polygon = Polygon(polygon_id=str(uuid4), points=[])
-    num_points = randint(3, max_pol_size)
+    num_points = randint(4, max_pol_size)
+
+    centroid = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
+                            np.random.uniform(low=domain.min_y, high=domain.max_y))
 
     for _ in range(num_points):
-        point = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
-                             np.random.uniform(low=domain.min_y, high=domain.max_y))
+        if is_large:
+            point = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
+                                 np.random.uniform(low=domain.min_y, high=domain.max_y))
+        else:
+            point = PolygonPoint(np.random.normal(centroid.x, domain.len_x * 0.05),
+                                 np.random.normal(centroid.y, domain.len_y * 0.05))
         polygon.points.append(point)
     return polygon
