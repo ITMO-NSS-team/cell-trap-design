@@ -2,8 +2,9 @@
 # """
 # Created on Wed Feb  3 12:49:07 2021
 import os
-from typing import List
+from uuid import uuid4
 
+import numpy as np
 import pickledb
 
 # from comsol.polygen import poly_add
@@ -33,82 +34,94 @@ def poly_add(model, polygons):
 
 
 def execute(structure: Structure, with_vizualization=True) -> float:
+    model = _load_simulation_result(structure)
+    if model is None:
+        client = GlobalEnv.comsol_client
+
+        poly_box = []
+
+        for i, pol in enumerate(structure.polygons):
+            poly_repr = []
+            # for j, pt in enumerate(pol.points):
+            poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
+            poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
+            poly_box.append(poly_repr)
+
+        model = client.load(f'{project_root()}/comsol/Comsol2pics_add_curl_curv.mph')
+
+        model = poly_add(model, poly_box)
+
+        model.build()
+        model.mesh()
+        model.solve()
+
     try:
-        saved_result = _load_simulation_result(structure)
-        if saved_result is not None:
-            speeds = saved_result
-        else:
-            client = GlobalEnv.comsol_client
 
-            poly_box = []
-
-            for i, pol in enumerate(structure.polygons):
-                poly_repr = []
-                # for j, pt in enumerate(pol.points):
-                poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
-                poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
-                poly_box.append(poly_repr)
-
-            model = client.load(f'{project_root()}/comsol/Comsol2pics.mph')
-
-            model = poly_add(model, poly_box)
-
-            model.build()
-            model.mesh()
-            model.solve()
-
-            speeds = [model.evaluate('vlct_1'),
-                      model.evaluate('vlct_2'),
-                      model.evaluate('vlct_3'),
-                      model.evaluate('vlct_4'),
-                      model.evaluate('vlct_5'),
-                      model.evaluate('vlct_side'),
-                      model.evaluate('vlct_main')]
-
-            speeds = [float(_) for _ in speeds]
-
-            _save_simulation_result(structure, speeds)
-
-            target = float(sum(speeds[0:5])) / float(sum(speeds[5:7]))
-
-            if with_vizualization:
-                x = model.evaluate('x')
-                y = model.evaluate('y')
-                U = model.evaluate('spf.U')
-                plt.title(round(target, 6))
-                plt.scatter(x, y, c=U, cmap=plt.cm.coolwarm,
-                            vmin=0, vmax=0.003)
-                # plt.colorbar()
-                #plt.show()
-                plt.savefig(f'./tmp/{target}.png')
-                plt.clf()
-
-        target = float(sum(speeds[0:5])) / float(sum(speeds[5:7]))
-        print(target, [round(_, 5) for _ in speeds])
+        outs = [model.evaluate('vlct_1'),
+                model.evaluate('vlct_2'),
+                model.evaluate('vlct_3'),
+                model.evaluate('vlct_4'),
+                model.evaluate('vlct_5'),
+                model.evaluate('vlct_side'),
+                model.evaluate('vlct_main')]
     except Exception as ex:
         print(ex)
+        return 0.0
+
+    u = model.evaluate('spf.U')
+    curl = model.evaluate('curl')
+    curv = model.evaluate('curv') / 10 ** 7
+
+    fast_u_tresh = 0
+    fast_u = np.mean(u[u > 0]) + (np.max(u) - np.mean(u[u > 0])) * fast_u_tresh
+    width_ratio = len(u[u > fast_u]) / len(u[u > 0])
+
+    outs = [float(_) for _ in outs]
+
+    _save_simulation_result(structure, model)
+
+    target = float(sum(outs[0:5])) / float(sum(outs[5:7]))
+    if (curl > 30000) or ((width_ratio < 0.25) or (width_ratio > 0.34)):
         target = 0
+
+    if with_vizualization:
+        x = model.evaluate('x')
+        y = model.evaluate('y')
+        u = model.evaluate('spf.U')
+        plt.title(round(target, 6))
+        plt.scatter(x, y, c=u, cmap=plt.cm.coolwarm)
+        # vmin=0, vmax=0.003)
+        # plt.colorbar()
+        # plt.show()
+        plt.savefig(f'./tmp/{target}.png')
+        plt.clf()
+
+    print(target, [round(_, 5) for _ in outs], curl, curv, width_ratio)
 
     return target
 
 
-def _save_simulation_result(configuration, target: List[float]):
+def _save_simulation_result(configuration, model):
+    if not os.path.exists('./models'):
+        os.mkdir('./models')
+    model_uid = str(uuid4())
+    model.save(f'./models/{model_uid}.mph')
     db = pickledb.load('comsol_db.saved', False)
-    db.set(str(configuration), ' '.join([str(_) for _ in target]))
+    db.set(str(configuration), model_uid)
     db.dump()
 
 
 def _load_simulation_result(configuration):
     db = pickledb.load('comsol_db.saved', False)
 
-    target_str = db.get(str(configuration))
+    model_uid = db.get(str(configuration))
 
-    if target_str is False:
+    if model_uid is False:
         return None
 
-    target = [float(_) for _ in target_str.split(' ')]
+    model = GlobalEnv.comsol_client.load(f'./models/{model_uid}.mph')
 
-    return target
+    return model
 
 
 def _load_simulation_result_reference_by_id(self, id):

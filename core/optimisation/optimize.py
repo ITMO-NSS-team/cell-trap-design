@@ -12,7 +12,7 @@ def optimize(domain: Domain, mode='single_obj'):
     results = []
     if mode == 'single_obj':
         params = DefaultGA.Params(max_gens=100, pop_size=100,
-                                  crossover_rate=0.4, mutation_rate=0.6,
+                                  crossover_rate=0.6, mutation_rate=0.6,
                                   mutation_value_rate=[])
         _, best = DefaultGA(
             params=params,

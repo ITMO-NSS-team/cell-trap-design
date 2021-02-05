@@ -22,10 +22,10 @@ class Structure:
         return out_str
 
 
-def get_random_structure(max_pols_num=4, max_pol_size=8) -> Structure:
+def get_random_structure(min_pols_num=2, max_pols_num=4, max_pol_size=8) -> Structure:
     structure = Structure(polygons=[])
 
-    num_pols = randint(1, max_pols_num)
+    num_pols = randint(min_pols_num, max_pols_num)
     is_large = num_pols == 1
 
     for _ in range(num_pols):
@@ -41,13 +41,13 @@ def get_random_poly(max_pol_size=8, is_large=False):
     polygon = Polygon(polygon_id=str(uuid4), points=[])
     num_points = randint(4, max_pol_size)
 
-    centroid = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
-                            np.random.uniform(low=domain.min_y, high=domain.max_y))
+    centroid = PolygonPoint(np.random.uniform(low=domain.min_x + 40, high=domain.max_x - 40),
+                            np.random.uniform(low=domain.min_y + 40, high=domain.max_y - 40))
 
     for _ in range(num_points):
         if is_large:
-            point = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
-                                 np.random.uniform(low=domain.min_y, high=domain.max_y))
+            point = PolygonPoint(np.random.uniform(low=domain.min_x + 40, high=domain.max_x - 40),
+                                 np.random.uniform(low=domain.min_y + 40, high=domain.max_y - 40))
         else:
             point = PolygonPoint(np.random.normal(centroid.x, domain.len_x * 0.05),
                                  np.random.normal(centroid.y, domain.len_y * 0.05))

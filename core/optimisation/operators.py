@@ -46,53 +46,60 @@ def mutation(structure: Structure, rate):
 
     is_correct = False
 
-    polygon_drop_mutation_prob = 0.3
-    polygon_add_mutation_prob = 0.3
-    point_drop_mutation_prob = 0.3
-    point_add_mutation_prob = 0.3
+    min_pol_size = 4
+
+    polygon_drop_mutation_prob = 0.2
+    polygon_add_mutation_prob = 0.2
+    point_drop_mutation_prob = 0.2
+    point_add_mutation_prob = 0.2
+
+    changes_num = random.randint(1, 5)
 
     while not is_correct:
         is_correct = True
         new_structure = copy.deepcopy(structure)
 
-        polygon_to_mutate = new_structure.polygons[random.randint(0, len(new_structure.polygons) - 1)]
+        for _ in range(changes_num):
+            polygon_to_mutate = new_structure.polygons[random.randint(0, len(new_structure.polygons) - 1)]
 
-        if random.random() < polygon_drop_mutation_prob and len(new_structure.polygons) > 1:
-            # if drop polygon from structure
-            new_structure.polygons.remove(polygon_to_mutate)
-        elif random.random() < polygon_add_mutation_prob:
-            # if drop polygon from structure
-            new_structure.polygons.append(get_random_poly())
-        else:
-            mutate_point_ind = random.randint(0, len(polygon_to_mutate.points) - 1)
-            point_to_mutate = polygon_to_mutate.points[mutate_point_ind]
-            if random.random() < point_drop_mutation_prob and len(polygon_to_mutate.points) > 3:
-                # if drop point from polygon
-                polygon_to_mutate.points.remove(point_to_mutate)
+            if random.random() < polygon_drop_mutation_prob and len(new_structure.polygons) > 1:
+                # if drop polygon from structure
+                new_structure.polygons.remove(polygon_to_mutate)
+            elif random.random() < polygon_add_mutation_prob:
+                # if drop polygon from structure
+                new_structure.polygons.append(get_random_poly())
             else:
-                # if change point in polygon
-
-                domain = GlobalEnv.domain
-                params = [domain.len_x * 0.05, domain.len_x * 0.025]
-
-                mutation_ratio_x = abs(np.random.normal(params[0], params[1], 1)[0])
-                mutation_ratio_y = abs(np.random.normal(params[0], params[1], 1)[0])
-
-                sign = 1 if random.random() < 0.5 else -1
-
-                new_point = copy.deepcopy(point_to_mutate)
-                new_point.x += sign * mutation_ratio_x
-                new_point.x = round(abs(new_point.x))
-                new_point.y += sign * mutation_ratio_y
-                new_point.y = round(abs(new_point.y))
-
-                if random.random() < polygon_add_mutation_prob:
-                    if mutate_point_ind + 1 < len(polygon_to_mutate.points):
-                        polygon_to_mutate.points.insert(mutate_point_ind + 1, new_point)
-                    else:
-                        polygon_to_mutate.points.insert(mutate_point_ind - 1, new_point)
+                mutate_point_ind = random.randint(0, len(polygon_to_mutate.points) - 1)
+                point_to_mutate = polygon_to_mutate.points[mutate_point_ind]
+                if (random.random() < point_drop_mutation_prob and
+                        len(polygon_to_mutate.points) > min_pol_size):
+                    # if drop point from polygon
+                    polygon_to_mutate.points.remove(point_to_mutate)
                 else:
-                    polygon_to_mutate.points[mutate_point_ind] = new_point
+                    # if change point in polygon
+
+                    domain = GlobalEnv.domain
+                    params_x = [domain.len_x * 0.05, domain.len_x * 0.025]
+                    params_y = [domain.len_y * 0.05, domain.len_y * 0.025]
+
+                    mutation_ratio_x = abs(np.random.normal(params_x[0], params_x[1], 1)[0])
+                    mutation_ratio_y = abs(np.random.normal(params_y[0], params_y[1], 1)[0])
+
+                    sign = 1 if random.random() < 0.5 else -1
+
+                    new_point = copy.deepcopy(point_to_mutate)
+                    new_point.x += sign * mutation_ratio_x
+                    new_point.x = round(abs(new_point.x))
+                    new_point.y += sign * mutation_ratio_y
+                    new_point.y = round(abs(new_point.y))
+
+                    if random.random() < point_add_mutation_prob:
+                        if mutate_point_ind + 1 < len(polygon_to_mutate.points):
+                            polygon_to_mutate.points.insert(mutate_point_ind + 1, new_point)
+                        else:
+                            polygon_to_mutate.points.insert(mutate_point_ind - 1, new_point)
+                    else:
+                        polygon_to_mutate.points[mutate_point_ind] = new_point
 
         is_correct = check_constraints(new_structure)
 
@@ -102,12 +109,15 @@ def mutation(structure: Structure, rate):
 def initial_pop_random(size: int):
     population_new = []
 
+    print('Start init')
+
     for _ in range(0, size):
         while len(population_new) < size:
-            # TODO create around centroids
-            structure = get_random_structure(max_pols_num=5, max_pol_size=10)
+            structure = get_random_structure(min_pols_num=2, max_pols_num=5, max_pol_size=10)
             is_correct = check_constraints(structure)
             if is_correct:
+                print('Created')
                 population_new.append(structure)
 
+    print('End init')
     return population_new
