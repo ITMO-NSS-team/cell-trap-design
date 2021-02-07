@@ -1,6 +1,7 @@
 # # -*- coding: utf-8 -*-
 # """
 # Created on Wed Feb  3 12:49:07 2021
+import gc
 import os
 from uuid import uuid4
 
@@ -34,9 +35,11 @@ def poly_add(model, polygons):
 
 
 def execute(structure: Structure, with_vizualization=True) -> float:
+    gc.collect()
+    client = GlobalEnv.comsol_client
+
     model = _load_simulation_result(structure)
     if model is None:
-        client = GlobalEnv.comsol_client
 
         poly_box = []
 
@@ -49,14 +52,20 @@ def execute(structure: Structure, with_vizualization=True) -> float:
 
         model = client.load(f'{project_root()}/comsol/Comsol2pics_add_curl_curv.mph')
 
-        model = poly_add(model, poly_box)
+        try:
+            model = poly_add(model, poly_box)
 
-        model.build()
-        model.mesh()
-        model.solve()
+            model.build()
+            model.mesh()
+            model.solve()
+        except Exception as ex:
+            print(ex)
+            client.clear()
+            return 0.0
+
+        _save_simulation_result(structure, model)
 
     try:
-
         outs = [model.evaluate('vlct_1'),
                 model.evaluate('vlct_2'),
                 model.evaluate('vlct_3'),
@@ -66,6 +75,7 @@ def execute(structure: Structure, with_vizualization=True) -> float:
                 model.evaluate('vlct_main')]
     except Exception as ex:
         print(ex)
+        client.clear()
         return 0.0
 
     u = model.evaluate('spf.U')
@@ -78,17 +88,17 @@ def execute(structure: Structure, with_vizualization=True) -> float:
 
     outs = [float(_) for _ in outs]
 
-    _save_simulation_result(structure, model)
-
     target = float(sum(outs[0:5])) / float(sum(outs[5:7]))
     if (curl > 30000) or ((width_ratio < 0.25) or (width_ratio > 0.34)):
         target = 0
 
-    if with_vizualization:
+    if with_vizualization and target > 0:
         x = model.evaluate('x')
         y = model.evaluate('y')
         u = model.evaluate('spf.U')
-        plt.title(round(target, 6))
+        lbl = f'{round(target, 4)}, \n {[round(_, 4) for _ in outs]}, \n ' \
+              f'{round(float(curl))}, {round(curv, 4)}, {round(width_ratio, 4)}'
+        plt.title(lbl)
         plt.scatter(x, y, c=u, cmap=plt.cm.coolwarm)
         # vmin=0, vmax=0.003)
         # plt.colorbar()
@@ -96,7 +106,11 @@ def execute(structure: Structure, with_vizualization=True) -> float:
         plt.savefig(f'./tmp/{target}.png')
         plt.clf()
 
-    print(target, [round(_, 5) for _ in outs], curl, curv, width_ratio)
+    client.clear()
+
+    if target > 0:
+        print(round(target, 4), [round(_, 4) for _ in outs], round(float(curl)), \
+              round(curv, 4), round(width_ratio, 4))
 
     return target
 

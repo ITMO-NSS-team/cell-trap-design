@@ -2,6 +2,8 @@ import copy
 import math
 from random import randint
 
+import numpy as np
+
 
 class GA:
     def __init__(self, params, calculate_objectives, evolutionary_operators,
@@ -67,26 +69,34 @@ class GA:
         min_group_size = 2 if len(self._pop) > 1 else 1
         group_size = max(group_size, min_group_size)
         chosen = []
-        for _ in range(self.params.pop_size):
+        n_iter = 0
+        while len(chosen) < self.params.pop_size:
+            n_iter += 1
             group = self.random_selection(group_size)
             best = min(group, key=lambda ind: ind.fitness)
             best.generation_number = self.generation_number
-            chosen.append(best)
-
+            if best not in chosen:
+                chosen.append(best)
+            elif n_iter > self.params.pop_size + 100:
+                print('RAND SELECTED')
+                n_iter = 0
+                rnd = self._pop[randint(0, len(self._pop) - 1)]
+                chosen.append(rnd)
         return chosen
 
     def reproduce(self, selected):
 
         children = []
-
-        for pair_index in range(0, len(selected), 2):
+        np.random.shuffle(selected)
+        for pair_index in range(0, len(selected) - 1):
             p1 = selected[pair_index]
             p2 = selected[pair_index + 1]
 
             child_gen = self.crossover(p1.genotype, p2.genotype, self.params.crossover_rate)
             child_gen = self.mutation(child_gen, self.params.mutation_rate)
-            child = GA.Individ(genotype=child_gen)
-            child.generation_number = self.generation_number
-            children.append(child)
+            if str(child_gen) != str(p1.genotype) and str(child_gen) != str(p2.genotype):
+                child = GA.Individ(genotype=copy.deepcopy(child_gen))
+                child.generation_number = self.generation_number
+                children.append(child)
 
         return children

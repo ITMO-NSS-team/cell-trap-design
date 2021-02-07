@@ -9,7 +9,13 @@ MIN_DIST = 15
 
 
 def check_constraints(structure: Structure) -> bool:
-    return not (_out_of_bound(structure) or _too_close(structure) or _self_intersection(structure))
+    model_func = GlobalEnv.model_func
+    structurally_correct = not (_out_of_bound(structure) or _too_close(structure) or _self_intersection(structure))
+    if structurally_correct:
+        sim_correct = -model_func(structure) < 0
+    else:
+        sim_correct = False
+    return structurally_correct and sim_correct
 
 
 def _out_of_bound(structure: Structure) -> bool:

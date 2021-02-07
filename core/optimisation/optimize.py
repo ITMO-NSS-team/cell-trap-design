@@ -11,7 +11,7 @@ def optimize(domain: Domain, mode='single_obj'):
     operators = default_operators()
     results = []
     if mode == 'single_obj':
-        params = DefaultGA.Params(max_gens=100, pop_size=100,
+        params = DefaultGA.Params(max_gens=100, pop_size=300,
                                   crossover_rate=0.6, mutation_rate=0.6,
                                   mutation_value_rate=[])
         _, best = DefaultGA(
@@ -22,7 +22,6 @@ def optimize(domain: Domain, mode='single_obj'):
         results = [best]
 
     elif mode == 'multi_obj':
-
         params = DefaultSPEA2.Params(max_gens=40, pop_size=30, archive_size=10,
                                      crossover_rate=0.5, mutation_rate=0.5,
                                      mutation_value_rate=[])

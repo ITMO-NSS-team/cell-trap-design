@@ -21,6 +21,15 @@ class Structure:
                 out_str += f'Point {j}: x={round(pt.x, 2)}, y={round(pt.y, 2)}; '
         return out_str
 
+    @property
+    def text_id(self):
+        out_str = ''
+        for i, pol in enumerate(self.polygons):
+            out_str += f'P{i}={len(pol.points)}:'
+            for j, pt in enumerate(pol.points):
+                out_str += f'(x={round(pt.x, 2)}, y={round(pt.y, 2)}); '
+        return out_str
+
 
 def get_random_structure(min_pols_num=2, max_pols_num=4, max_pol_size=8) -> Structure:
     structure = Structure(polygons=[])

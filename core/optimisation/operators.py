@@ -7,16 +7,23 @@ from core.optimisation.constraints import check_constraints
 from core.structure.structure import (Structure, get_random_poly, get_random_structure)
 from core.utils import GlobalEnv
 
+MAX_ITER = 1000
+
 
 def crossover(s1: Structure, s2: Structure, rate=0.4):
     random_val = random.random()
-    if random_val >= rate:
-        return s1
+    if random_val >= rate or len(s1.polygons) == 1 or len(s2.polygons) == 1:
+        if random.random() > 0.5:
+            return s1
+        else:
+            return s2
 
     is_correct = False
+    n_iter = 0
 
-    while not is_correct:
-        is_correct = True
+    while not is_correct and n_iter < MAX_ITER:
+        n_iter += 1
+        print(n_iter)
         new_structure = copy.deepcopy(s1)
 
         crossover_point = random.randint(1, len(new_structure.polygons))
@@ -55,8 +62,10 @@ def mutation(structure: Structure, rate):
 
     changes_num = random.randint(1, 5)
 
-    while not is_correct:
-        is_correct = True
+    n_iter = 0
+    while not is_correct and n_iter < MAX_ITER:
+        n_iter += 1
+        print(n_iter)
         new_structure = copy.deepcopy(structure)
 
         for _ in range(changes_num):
@@ -113,7 +122,7 @@ def initial_pop_random(size: int):
 
     for _ in range(0, size):
         while len(population_new) < size:
-            structure = get_random_structure(min_pols_num=2, max_pols_num=5, max_pol_size=10)
+            structure = get_random_structure(min_pols_num=1, max_pols_num=5, max_pol_size=10)
             is_correct = check_constraints(structure)
             if is_correct:
                 print('Created')

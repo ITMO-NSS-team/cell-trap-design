@@ -7,16 +7,16 @@ Created on Wed Feb  3 16:48:49 2021
 import numpy as np
 
 
-def random_poly(N_vert, box):
+def random_poly(n_vert, box):
     x1 = box[0]
     y1 = box[1]
     x2 = box[2]
     y2 = box[3]
-    xnum = np.random.uniform(low=x1, high=x2, size=N_vert)
-    ynum = np.random.uniform(low=y1, high=y2, size=N_vert)
+    xnum = np.random.uniform(low=x1, high=x2, size=n_vert)
+    ynum = np.random.uniform(low=y1, high=y2, size=n_vert)
     xstr = str(xnum[0])
     ystr = str(ynum[0])
-    for i in range(1, N_vert):
+    for i in range(1, n_vert):
         xstr += (' ' + str(xnum[i]))
         ystr += (' ' + str(ynum[i]))
     return [xstr, ystr]
