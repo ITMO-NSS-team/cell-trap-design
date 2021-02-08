@@ -64,9 +64,9 @@ class EvoAnalytics:
         f = f'HistoryFiles/history_{EvoAnalytics.run_id}.csv'
 
         df = pd.read_csv(f, header=0)
-
-        # df = pd.DataFrame({'pop_num': df['pop_num'], 'fitness': df['obj0']})
         plt.clf()
-        plt.rcParams['axes.titlesize'] = 30
+        plt.figure(figsize=(20, 10))
+        plt.xticks(rotation=45)
+        # plt.rcParams['axes.titlesize'] = 30
         sns.boxplot(x=df['pop_num'], y=df['obj0'], palette="Blues")
         plt.show()
