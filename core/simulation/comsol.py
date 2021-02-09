@@ -9,7 +9,7 @@ from uuid import uuid4
 import numpy as np
 import pickledb
 
-# from comsol.polygen import poly_add
+from comsol.polygen import poly_draw
 from core.structure.structure import Structure
 
 # @author: user
@@ -97,9 +97,12 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
             y = model.evaluate('y')
             u = model.evaluate('spf.U')
             lbl = f'{round(target, 4)}, \n {[round(_, 4) for _ in outs]}, \n ' \
-                f'{round(float(curl))}, {round(curv, 4)}, {round(width_ratio, 4)}'
-            plt.title(lbl)
-            plt.scatter(x, y, c=u, cmap=plt.cm.coolwarm)
+                  f'{round(float(curl))}, {round(curv, 4)}, {round(width_ratio, 4)}'
+            # plt.title(lbl)
+            # plt.scatter(x, y, c=u, cmap=plt.cm.coolwarm)
+
+            poly_draw(model)
+
             # vmin=0, vmax=0.003)
             # plt.colorbar()
             # plt.show()

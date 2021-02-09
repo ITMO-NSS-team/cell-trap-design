@@ -44,7 +44,7 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
     return structure
 
 
-def get_random_poly(min_pol_size=10, max_pol_size=50, is_large=False):
+def get_random_poly(min_pol_size=7, max_pol_size=20, is_large=False):
     domain = GlobalEnv.domain
 
     polygon = Polygon(polygon_id=str(uuid4), points=[])
