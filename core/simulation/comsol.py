@@ -97,7 +97,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
             y = model.evaluate('y')
             u = model.evaluate('spf.U')
             lbl = f'{round(target, 4)}, \n {[round(_, 4) for _ in outs]}, \n ' \
-                  f'{round(float(curl))}, {round(curv, 4)}, {round(width_ratio, 4)}'
+                f'{round(float(curl))}, {round(curv, 4)}, {round(width_ratio, 4)}'
             plt.title(lbl)
             plt.scatter(x, y, c=u, cmap=plt.cm.coolwarm)
             # vmin=0, vmax=0.003)
@@ -141,7 +141,7 @@ def _load_simulation_result(configuration):
     model_uid = db.get(str(configuration))
 
     if model_uid is False:
-        return None
+        return None, None
 
     model = GlobalEnv.comsol_client.load(f'./models/{model_uid}.mph')
 

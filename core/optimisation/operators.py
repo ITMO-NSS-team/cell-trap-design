@@ -122,7 +122,7 @@ def initial_pop_random(size: int):
 
     for _ in range(0, size):
         while len(population_new) < size:
-            structure = get_random_structure(min_pols_num=1, max_pols_num=5, max_pol_size=10)
+            structure = get_random_structure(min_pols_num=1, max_pols_num=5, min_pol_size=10, max_pol_size=50)
             is_correct = check_constraints(structure)
             if is_correct:
                 print('Created')

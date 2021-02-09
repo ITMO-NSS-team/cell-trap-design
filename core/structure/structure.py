@@ -31,24 +31,24 @@ class Structure:
         return out_str
 
 
-def get_random_structure(min_pols_num=2, max_pols_num=4, max_pol_size=8) -> Structure:
+def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=8) -> Structure:
     structure = Structure(polygons=[])
 
     num_pols = randint(min_pols_num, max_pols_num)
     is_large = num_pols == 1
 
     for _ in range(num_pols):
-        polygon = get_random_poly(max_pol_size, is_large=is_large)
+        polygon = get_random_poly(min_pol_size, max_pol_size, is_large=is_large)
         structure.polygons.append(polygon)
 
     return structure
 
 
-def get_random_poly(max_pol_size=8, is_large=False):
+def get_random_poly(min_pol_size=10, max_pol_size=50, is_large=False):
     domain = GlobalEnv.domain
 
     polygon = Polygon(polygon_id=str(uuid4), points=[])
-    num_points = randint(4, max_pol_size)
+    num_points = randint(min_pol_size, max_pol_size)
 
     centroid = PolygonPoint(np.random.uniform(low=domain.min_x + 40, high=domain.max_x - 40),
                             np.random.uniform(low=domain.min_y + 40, high=domain.max_y - 40))
