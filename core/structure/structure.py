@@ -105,7 +105,8 @@ def get_random_poly(min_pol_size=5, max_pol_size=15, is_large=False,
         prev_point = centroid
         for _ in range(num_points):
             if is_large:
-                point = centroid
+                point = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
+                                     np.random.uniform(low=domain.min_y, high=domain.max_y))
             else:
                 point = get_random_point(prev_point)
 
