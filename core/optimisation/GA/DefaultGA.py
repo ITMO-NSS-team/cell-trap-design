@@ -29,7 +29,7 @@ class DefaultGA(GA):
 
             for individ in self._pop:
                 individ.population_number = self.generation_number
-                individ.analytics_objectives = ''  # individ.genotype.text_id
+                # individ.analytics_objectives = ''
 
             self.fitness()
 

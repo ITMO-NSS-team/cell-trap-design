@@ -43,7 +43,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
         model, idx = _load_simulation_result(structure)
         if model is None:
             poly_box = []
-
+            print('Start COMSOL')
             for i, pol in enumerate(structure.polygons):
                 poly_repr = []
                 poly_repr.append(' '.join([str(pt.x) for pt in pol.points]))
@@ -61,7 +61,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
             except Exception as ex:
                 print(ex)
                 client.clear()
-                return 0.0
+                return 0.0, idx
 
             idx = _save_simulation_result(structure, model)
 
@@ -76,7 +76,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
         except Exception as ex:
             print(ex)
             client.clear()
-            return 0.0
+            return 0.0, idx
 
         u = model.evaluate('spf.U')
         curl = model.evaluate('curl')
@@ -93,19 +93,11 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
             target = 0
 
         if with_vizualization and target > 0:
-            x = model.evaluate('x')
-            y = model.evaluate('y')
-            u = model.evaluate('spf.U')
-            lbl = f'{round(target, 4)}, \n {[round(_, 4) for _ in outs]}, \n ' \
-                  f'{round(float(curl))}, {round(curv, 4)}, {round(width_ratio, 4)}'
-            # plt.title(lbl)
-            # plt.scatter(x, y, c=u, cmap=plt.cm.coolwarm)
-
             poly_draw(model)
 
-            # vmin=0, vmax=0.003)
-            # plt.colorbar()
-            # plt.show()
+            if not os.path.exists('./tmp'):
+                os.mkdir('./tmp')
+
             plt.savefig(f'./tmp/{target}.png')
             plt.clf()
 
@@ -113,7 +105,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
 
         _save_fitness(structure, target)
         if target > 0:
-            print(round(target, 4), [round(_, 4) for _ in outs], round(float(curl)), \
+            print(round(target, 4), [round(_, 4) for _ in outs], round(float(curl)),
                   round(curv, 4), round(width_ratio, 4))
     else:
         print(f'Cached: {target}')

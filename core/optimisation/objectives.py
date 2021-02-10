@@ -7,9 +7,9 @@ def calculate_objectives(population, visualiser=None):
     for ind_id, ind in enumerate(population):
         structure = ind.genotype
         effectiveness, idx = model_func(structure)
-        ind.objectives = [-effectiveness]
-        ind.idx = ind_id
+        ind.objectives = [-effectiveness + structure.size / 100000]
+        ind.analytics_objectives = [-effectiveness]
         EvoAnalytics.save_cantidate(ind.population_number, ind.objectives,
                                     ind.analytics_objectives,
                                     ind.genotype,
-                                    'common_dataset', ind_id)
+                                    'common_dataset', idx)

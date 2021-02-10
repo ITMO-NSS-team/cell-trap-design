@@ -36,9 +36,6 @@ class EvoAnalytics:
 
     @staticmethod
     def _write_candidate_to_csv(f, pop_num, objs, analytics_objectives, genotype, referenced_dataset, local_id):
-        if len(analytics_objectives) == 0:
-            analytics_objectives = objs
-
         writer = csv.writer(f, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(
             [pop_num, referenced_dataset, ','.join([str(round(_, 6)) for _ in objs]),
@@ -47,11 +44,11 @@ class EvoAnalytics:
     @staticmethod
     def _write_header_to_csv(f, objectives, analytics_objectives, genotype):
         if len(analytics_objectives) == 0:
-            analytics_objectives = objectives
+            analytics_objectives = []
         writer = csv.writer(f, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(
             ['pop_num', 'referenced_dataset', ','.join([f'obj{_}' for _ in range(0, len(objectives))]),
-             ','.join([f'ananlytics_ob{_}' for _ in range(0, len(analytics_objectives))]), 'local_id'])
+             ','.join([f'ananlytics_ob{_}' for _ in range(len(analytics_objectives))]), 'local_id'])
 
     @staticmethod
     def clear():
