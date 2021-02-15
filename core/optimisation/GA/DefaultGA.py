@@ -1,3 +1,6 @@
+import os
+import time
+
 from core.optimisation.GA.GA import GA
 from core.optimisation.analytics import EvoAnalytics
 
@@ -12,6 +15,9 @@ class DefaultGA(GA):
         best = None
         while self.generation_number <= self.params.max_gens:
             print(f'Generation {self.generation_number}')
+
+            while os.path.exists('C:/stop.txt'):
+                time.sleep(60)
 
             # if self.visualiser is not None:
             #    self.visualiser.state = VisualiserState(self.generation_number)
