@@ -1,10 +1,10 @@
-from dataclasses import dataclass
 from random import randint
 from typing import List, Optional
 from uuid import uuid4
 
 import matplotlib.pyplot as plt
 import numpy as np
+from dataclasses import dataclass
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
@@ -45,7 +45,7 @@ class Structure:
     def plot(self):
         for poly in self.polygons:
             poly.plot()
-        geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv.domain.allowed_area])
+        geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv().domain.allowed_area])
         x, y = geom_poly_allowed.exterior.xy
         plt.plot(x, y)
         plt.show()
@@ -71,7 +71,7 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
 def get_random_poly(min_pol_size=5, max_pol_size=15, is_large=False,
                     parent_structure: Optional[Structure] = None) -> Optional[Polygon]:
     try:
-        domain = GlobalEnv.domain
+        domain = GlobalEnv().domain
 
         polygon = Polygon(polygon_id=str(uuid4), points=[])
         num_points = randint(min_pol_size, max_pol_size)
@@ -147,7 +147,7 @@ def get_random_poly(min_pol_size=5, max_pol_size=15, is_large=False,
 def get_random_point(prev_point: PolygonPoint,
                      parent_poly: Optional[Polygon] = None,
                      parent_structure: Optional[Structure] = None) -> Optional[PolygonPoint]:
-    domain = GlobalEnv.domain
+    domain = GlobalEnv().domain
     is_correct_point = False
     pt = None
     MAX_ITER = 5000
@@ -159,7 +159,7 @@ def get_random_point(prev_point: PolygonPoint,
             pt = PolygonPoint(
                 min(max(np.random.normal(prev_point.x, domain.len_x * 0.05), domain.min_x + 5), domain.max_x + 5),
                 min(max(np.random.normal(prev_point.y, domain.len_y * 0.05), domain.min_y - 5), domain.max_y - 5))
-            is_correct_point = GlobalEnv.domain.contains(pt)
+            is_correct_point = GlobalEnv().domain.contains(pt)
 
             if is_correct_point and parent_poly and len(parent_poly.points) > 0 and num_iter > MAX_ITER / 2:
                 # check then new point is not near existing points

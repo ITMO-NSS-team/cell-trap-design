@@ -3,7 +3,7 @@ from core.utils import GlobalEnv
 
 
 def calculate_objectives(population, visualiser=None):
-    model_func = GlobalEnv.model_func
+    model_func = GlobalEnv().model_func
     for ind_id, ind in enumerate(population):
         structure = ind.genotype
         effectiveness, idx = model_func(structure)

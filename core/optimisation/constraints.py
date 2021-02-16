@@ -3,7 +3,7 @@ from core.structure.structure import Structure
 from core.utils import GlobalEnv
 
 
-def check_constraints(structure: Structure) -> bool:
+def check_constraints(structure: Structure, is_lightweight: bool = False) -> bool:
     try:
         if any([(poly is None or
                  len(poly.points) == 0 or
@@ -13,11 +13,13 @@ def check_constraints(structure: Structure) -> bool:
             return False
 
         # structure.plot()
-        model_func = GlobalEnv.model_func
         structurally_correct = (not (out_of_bound(structure) or
                                      too_close(structure) or
                                      self_intersection(structure)))
-        if structurally_correct:
+
+        if structurally_correct and not is_lightweight:
+            print('Check heavy constraint')
+            model_func = GlobalEnv().model_func
             obj, _ = model_func(structure)
             return -obj < 0
         else:

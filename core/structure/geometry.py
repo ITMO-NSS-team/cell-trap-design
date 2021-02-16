@@ -9,7 +9,7 @@ MIN_DIST = 15
 
 
 def out_of_bound(structure: 'Structure') -> bool:
-    geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv.domain.allowed_area])
+    geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv().domain.allowed_area])
 
     for poly in structure.polygons:
         for pt in poly.points:

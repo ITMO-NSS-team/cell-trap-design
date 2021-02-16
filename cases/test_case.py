@@ -16,10 +16,10 @@ EvoAnalytics.clear()
 
 domain = Domain()
 
-GlobalEnv.domain = domain
-GlobalEnv.model_func = execute_comsol
-GlobalEnv.comsol_client = mph.Client(cores=4)
-GlobalEnv.full_save_load = False
+GlobalEnv().domain = domain
+GlobalEnv().model_func = execute_comsol
+GlobalEnv().comsol_client = mph.Client(cores=4)
+GlobalEnv().full_save_load = False
 
 optimization_results = optimize(domain)
 

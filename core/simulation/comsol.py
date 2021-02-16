@@ -37,9 +37,9 @@ def poly_add(model, polygons):
 
 def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
     gc.collect()
-    client = GlobalEnv.comsol_client
+    client = GlobalEnv().comsol_client
     target, idx = _load_fitness(structure)
-    if target is None or GlobalEnv.full_save_load:
+    if target is None or GlobalEnv().full_save_load:
         model, idx = _load_simulation_result(structure)
         if model is None:
             poly_box = []
@@ -138,7 +138,7 @@ def _load_simulation_result(configuration):
     if model_uid is False:
         return None, None
 
-    model = GlobalEnv.comsol_client.load(f'./models/{model_uid}.mph')
+    model = GlobalEnv().comsol_client.load(f'./models/{model_uid}.mph')
 
     return model, model_uid
 
@@ -164,7 +164,7 @@ if False:
     from core.utils import GlobalEnv
 
     domain = Domain(min_x=-140, max_x=-45, min_y=-165, max_y=50)
-    GlobalEnv.domain = domain
+    GlobalEnv().domain = domain
 
     test_structure = get_random_structure(3, 3)
     print(test_structure)

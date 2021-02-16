@@ -7,11 +7,11 @@ from core.utils import GlobalEnv
 
 
 def optimize(domain: Domain, mode='single_obj'):
-    GlobalEnv.domain = domain
+    GlobalEnv().domain = domain
     operators = default_operators()
     results = []
     if mode == 'single_obj':
-        params = DefaultGA.Params(max_gens=300, pop_size=300,
+        params = DefaultGA.Params(max_gens=300, pop_size=5,
                                   crossover_rate=0.6, mutation_rate=0.6,
                                   mutation_value_rate=[])
         _, best = DefaultGA(
