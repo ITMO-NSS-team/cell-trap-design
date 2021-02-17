@@ -1,3 +1,4 @@
+import json
 from random import randint
 from typing import List, Optional
 from uuid import uuid4
@@ -24,6 +25,9 @@ class Structure:
             for j, pt in enumerate(pol.points):
                 out_str += f'Point {j}: x={round(pt.x, 2)}, y={round(pt.y, 2)}; '
         return out_str
+
+    def __repr__(self):
+        return json.dumps(self, default=vars)
 
     @property
     def text_id(self):

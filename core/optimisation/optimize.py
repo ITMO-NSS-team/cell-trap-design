@@ -6,12 +6,12 @@ from core.structure.domain import Domain
 from core.utils import GlobalEnv
 
 
-def optimize(domain: Domain, mode='single_obj'):
+def optimize(domain: Domain, max_gens=300, pop_size=300, mode='single_obj'):
     GlobalEnv().domain = domain
     operators = default_operators()
     results = []
     if mode == 'single_obj':
-        params = DefaultGA.Params(max_gens=300, pop_size=5,
+        params = DefaultGA.Params(max_gens=max_gens, pop_size=pop_size,
                                   crossover_rate=0.6, mutation_rate=0.6,
                                   mutation_value_rate=[])
         _, best = DefaultGA(
@@ -22,7 +22,7 @@ def optimize(domain: Domain, mode='single_obj'):
         results = [best]
 
     elif mode == 'multi_obj':
-        params = DefaultSPEA2.Params(max_gens=40, pop_size=30, archive_size=10,
+        params = DefaultSPEA2.Params(max_gens=max_gens, pop_size=pop_size, archive_size=10,
                                      crossover_rate=0.5, mutation_rate=0.5,
                                      mutation_value_rate=[])
 
