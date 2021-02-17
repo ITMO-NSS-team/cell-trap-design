@@ -3,6 +3,7 @@
 # Created on Wed Feb  3 12:49:07 2021
 import gc
 import os
+import pickle
 from typing import Tuple
 from uuid import uuid4
 
@@ -25,6 +26,7 @@ global_env = GlobalEnv
 
 USE_AVG_CONST = False
 
+
 def poly_add(model, polygons):
     for n, poly in enumerate(polygons):
         try:
@@ -36,10 +38,10 @@ def poly_add(model, polygons):
     return model
 
 
-def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
+def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float, str]:
     gc.collect()
     client = GlobalEnv().comsol_client
-    target, idx = _load_fitness(structure)
+    target, mean_diff, idx = _load_fitness(structure)
     if target is None or GlobalEnv().full_save_load:
         model, idx = _load_simulation_result(structure)
         if model is None:
@@ -62,7 +64,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
             except Exception as ex:
                 print(ex)
                 client.clear()
-                return 0.0, idx
+                return 0.0, 100.0, idx
 
             idx = _save_simulation_result(structure, model)
 
@@ -77,7 +79,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
         except Exception as ex:
             print(ex)
             client.clear()
-            return 0.0, idx
+            return 0.0, 100.0, idx
 
         u = model.evaluate('spf.U')
         curl = model.evaluate('curl')
@@ -94,8 +96,9 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
             print('Speed common condition violated')
             target = 0
 
+        mean_diff = np.mean([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]])
         if USE_AVG_CONST and any([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 > 5.0 for o in outs[0:5]]):
-            print('Speed equality violated', [abs(float(o) / np.max(outs[0:5]) - 1) * 100 for o in outs[0:5]])
+            print('Speed equality violated', [abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]])
             target = 0
 
         if with_vizualization and target > 0:
@@ -109,14 +112,14 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
 
         client.clear()
 
-        _save_fitness(structure, target)
+        _save_fitness(structure, mean_diff, target)
         if target > 0:
             print(round(target, 4), [round(_, 4) for _ in outs], round(float(curl)),
                   round(curv, 4), round(width_ratio, 4))
     else:
         print(f'Cached: {target}')
 
-    return target, idx
+    return target, mean_diff, idx
 
 
 def _save_simulation_result(configuration, model):
@@ -127,13 +130,14 @@ def _save_simulation_result(configuration, model):
     db = pickledb.load('comsol_db.saved', False)
     db.set(str(configuration), model_uid)
     db.dump()
+
+    if not os.path.exists('./structures'):
+        os.mkdir('./structures')
+
+    with open(f'./structures/{model_uid}.str', 'wb') as f:
+        pickle.dump(configuration, f)
+
     return model_uid
-
-
-def _save_fitness(configuration, fitness):
-    db = pickledb.load('fitness_db.saved', False)
-    db.set(str(configuration), str(fitness))
-    db.dump()
 
 
 def _load_simulation_result(configuration):
@@ -149,6 +153,12 @@ def _load_simulation_result(configuration):
     return model, model_uid
 
 
+def _save_fitness(configuration, fitness1, fitness2):
+    db = pickledb.load('fitness_db.saved', False)
+    db.set(str(configuration), f'{str(fitness1)}|{str(fitness2)}')
+    db.dump()
+
+
 def _load_fitness(configuration):
     db = pickledb.load('fitness_db.saved', False)
 
@@ -156,9 +166,11 @@ def _load_fitness(configuration):
 
     model_uid = db_models.get(str(configuration))
 
-    fitness = db.get(str(configuration))
+    result = db.get(str(configuration))
 
-    if fitness is False:
-        return None, None
+    if result is False:
+        return None, None, None
+    else:
+        fitness, mean_diff = result.split('|')
 
-    return float(fitness), model_uid
+    return float(fitness), float(mean_diff), model_uid

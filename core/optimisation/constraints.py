@@ -20,7 +20,7 @@ def check_constraints(structure: Structure, is_lightweight: bool = False) -> boo
         if structurally_correct and not is_lightweight:
             print('Check heavy constraint')
             model_func = GlobalEnv().model_func
-            obj, _ = model_func(structure)
+            obj, _, _ = model_func(structure)
             return -obj < 0
         else:
             print('Constraint violated')

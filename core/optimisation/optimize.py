@@ -1,7 +1,7 @@
 from core.optimisation.GA.DefaultGA import DefaultGA
 from core.optimisation.SPEA2.DefaultSPEA2 import DefaultSPEA2
 from core.optimisation.SPEA2.Operators import default_operators
-from core.optimisation.objectives import calculate_objectives
+from core.optimisation.objectives import calculate_objectives, calculate_objectives_multi
 from core.structure.domain import Domain
 from core.utils import GlobalEnv
 
@@ -22,13 +22,13 @@ def optimize(domain: Domain, max_gens=300, pop_size=300, mode='single_obj'):
         results = [best]
 
     elif mode == 'multi_obj':
-        params = DefaultSPEA2.Params(max_gens=max_gens, pop_size=pop_size, archive_size=10,
-                                     crossover_rate=0.5, mutation_rate=0.5,
+        params = DefaultSPEA2.Params(max_gens=max_gens, pop_size=pop_size, archive_size=int(round(pop_size / 4)),
+                                     crossover_rate=0.6, mutation_rate=0.6,
                                      mutation_value_rate=[])
 
         _, results = DefaultSPEA2(
             params=params,
-            calculate_objectives=calculate_objectives,
+            calculate_objectives=calculate_objectives_multi,
             evolutionary_operators=operators).solution(verbose=True)
 
     return results
