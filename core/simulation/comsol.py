@@ -90,6 +90,11 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
 
         target = float(sum(outs[0:5])) / float(sum(outs[5:7]))
         if (curl > 30000) or ((width_ratio < 0.25) or (width_ratio > 0.34)):
+            print('Speed common condition violated')
+            target = 0
+
+        if any([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 > 10.0 for o in outs[0:5]]):
+            print('Speed equality violated', [abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]])
             target = 0
 
         if with_vizualization and target > 0:

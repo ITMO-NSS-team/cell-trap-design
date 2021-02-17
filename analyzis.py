@@ -1,10 +1,7 @@
-import csv
 import os
 from shutil import copyfile
 
-import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
 
 f = f'./cases/HistoryFiles/history_def.csv'
 
