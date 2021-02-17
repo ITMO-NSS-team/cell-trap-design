@@ -23,6 +23,7 @@ from core.utils import GlobalEnv
 
 global_env = GlobalEnv
 
+USE_AVG_CONST = False
 
 def poly_add(model, polygons):
     for n, poly in enumerate(polygons):
@@ -93,8 +94,8 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, str]:
             print('Speed common condition violated')
             target = 0
 
-        if any([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 > 10.0 for o in outs[0:5]]):
-            print('Speed equality violated', [abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]])
+        if USE_AVG_CONST and any([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 > 5.0 for o in outs[0:5]]):
+            print('Speed equality violated', [abs(float(o) / np.max(outs[0:5]) - 1) * 100 for o in outs[0:5]])
             target = 0
 
         if with_vizualization and target > 0:
@@ -161,17 +162,3 @@ def _load_fitness(configuration):
         return None, None
 
     return float(fitness), model_uid
-
-
-if False:
-    from core.optimisation.operators import get_random_structure
-    from core.structure.domain import Domain
-    from core.utils import GlobalEnv
-
-    domain = Domain(min_x=-140, max_x=-45, min_y=-165, max_y=50)
-    GlobalEnv().domain = domain
-
-    test_structure = get_random_structure(3, 3)
-    print(test_structure)
-    target = execute(test_structure)
-    print(target)
