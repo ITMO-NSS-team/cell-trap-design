@@ -60,10 +60,15 @@ class EvoAnalytics:
     def create_boxplot():
         f = f'HistoryFiles/history_{EvoAnalytics.run_id}.csv'
 
-        df = pd.read_csv(f, header=0)
+        df = pd.read_csv(f, header=0, sep="\s*,\s*")
         plt.clf()
         plt.figure(figsize=(20, 10))
         plt.xticks(rotation=45)
         # plt.rcParams['axes.titlesize'] = 30
         sns.boxplot(x=df['pop_num'], y=df['obj0'], palette="Blues")
+        plt.show()
+
+        plt.figure(figsize=(20, 10))
+        plt.xticks(rotation=45)
+        sns.boxplot(x=df['pop_num'], y=df['obj1'], palette="Blues")
         plt.show()

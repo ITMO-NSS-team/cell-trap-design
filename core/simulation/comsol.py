@@ -96,7 +96,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
             print('Speed common condition violated')
             target = 0
 
-        mean_diff = np.mean([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]])
+        mean_diff = float(np.mean([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]]))
         if USE_AVG_CONST and any([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 > 5.0 for o in outs[0:5]]):
             print('Speed equality violated', [abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]])
             target = 0
@@ -114,7 +114,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
 
         _save_fitness(structure, mean_diff, target)
         if target > 0:
-            print(round(target, 4), [round(_, 4) for _ in outs], round(float(curl)),
+            print(round(target, 4), round(mean_diff, 2), [round(_, 4) for _ in outs], round(float(curl)),
                   round(curv, 4), round(width_ratio, 4))
     else:
         print(f'Cached: {target}')

@@ -118,4 +118,8 @@ def poly_draw(model, sort=False):
 
     curl = model.evaluate('curl')
 
-    plt.title(f'target={target:2f} curv={curv:2f} curl={curl:2f} width_ratio={width_ratio:2f}')
+    outs = [model.evaluate('vlct_1'), model.evaluate('vlct_2'),
+            model.evaluate('vlct_3'), model.evaluate('vlct_4'), model.evaluate('vlct_5')]
+    mean_diff = float(np.mean([abs(float(o) / np.mean(outs) - 1) * 100 for o in outs]))
+
+    plt.title(f'target={target:2f} md={mean_diff:1f} curv={curv:2f} curl={curl:2f} width_ratio={width_ratio:2f}')
