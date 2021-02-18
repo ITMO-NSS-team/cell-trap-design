@@ -112,7 +112,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
 
         client.clear()
 
-        _save_fitness(structure, mean_diff, target)
+        _save_fitness(structure, target, mean_diff)
         if target > 0:
             print(round(target, 4), round(mean_diff, 2), [round(_, 4) for _ in outs], round(float(curl)),
                   round(curv, 4), round(width_ratio, 4))

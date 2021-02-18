@@ -7,9 +7,7 @@ Created on Wed Feb  3 16:48:49 2021
 import matplotlib.pyplot as plt
 import numpy as np
 
-from comsol.geometry import (bnds_up, bnds_down, rumb,
-                             trap_1, trap_2, trap_3,
-                             trap_4, trap_5)
+from comsol.geometry import (bnds_down, bnds_up, rumb, trap_1, trap_2, trap_3, trap_4, trap_5)
 
 
 def random_poly(N_vert, box):
@@ -122,4 +120,5 @@ def poly_draw(model, sort=False):
             model.evaluate('vlct_3'), model.evaluate('vlct_4'), model.evaluate('vlct_5')]
     mean_diff = float(np.mean([abs(float(o) / np.mean(outs) - 1) * 100 for o in outs]))
 
-    plt.title(f'target={target:2f} md={mean_diff:1f} curv={curv:2f} curl={curl:2f} width_ratio={width_ratio:2f}')
+    plt.title(
+        f'target={round(target, 3)} md={round(mean_diff, 1)} curv={curv:2f} curl={curl:2f} width_ratio={width_ratio:2f}')

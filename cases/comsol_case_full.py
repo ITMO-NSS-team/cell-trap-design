@@ -10,8 +10,6 @@ from core.simulation.comsol import execute as execute_comsol
 from core.structure.domain import Domain
 from core.utils import GlobalEnv
 
-# mport ray
-
 if __name__ == '__main__':
     random.seed(42)
     np.random.seed(42)
@@ -27,7 +25,7 @@ if __name__ == '__main__':
     global_env.comsol_client = mph.Client(cores=12)
     global_env.full_save_load = False
 
-    optimization_results = optimize(domain, max_gens=300, pop_size=300)
+    optimization_results = optimize(domain, max_gens=300, pop_size=300, mode='single_obj')
 
     for result in optimization_results:
         print(result.objectives)
