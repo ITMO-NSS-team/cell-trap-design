@@ -4,7 +4,13 @@ from core.structure.polygon import PolygonPoint
 
 
 class Domain:
-    allowed_area = [(-125, 100), (-75, 155), (15, 155), (30, 90), (-40, -50), (-40, -155), (-125, -155)]
+    allowed_area = [(-125, 100),
+                    (-75, 155),
+                    (15, 155),
+                    (40, 90),
+                    (-10, -130),
+                    (-10, -155),
+                    (-125, -155)]
 
     @property
     def min_x(self):
