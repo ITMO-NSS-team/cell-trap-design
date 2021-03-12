@@ -2,7 +2,6 @@ import csv
 import os
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -67,7 +66,7 @@ class EvoAnalytics:
         df = df.loc[df['pop_num'] % 2 == 0]
 
         plt.clf()
-        plt.figure(figsize=(20, 10))
+        plt.figure(figsize=(20, 7))
         # plt.xticks(rotation=45)
 
         fsize = 24
@@ -75,20 +74,20 @@ class EvoAnalytics:
         plt.tick_params(labelsize=fsize)
         plt.rc('xtick', labelsize=fsize)
         plt.rc('ytick', labelsize=fsize)
-        plt.xticks(rotation=90)
+        plt.xticks(rotation=0)
         plt.yticks(rotation=90)
 
         sns.boxplot(x=df['pop_num'], y=df['obj0'], palette="Blues")
 
         plt.ylabel('Fitness (flow ratio)', fontsize=fsize)
-        plt.xlabel('Generations, #', fontsize=fsize, rotation=180)
+        plt.xlabel('Generations, #', fontsize=fsize, rotation=0)
 
         plt.hlines(y=max(df['obj0']), xmin=min(df['pop_num']), xmax=max(df['pop_num']),
                    linestyles='dashed')
 
-        plt.text(min(df['obj0']), max(df['obj0']) * 0.97,
+        plt.text(min(df['obj0']), max(df['obj0']) * 0.95,
                  f"Best found topology with fitness {round(max(df['obj0']), 4)}",
-                 size=fsize, rotation=180)
+                 size=fsize, rotation=0)
 
         ax = plt.gca()
         for index, label in enumerate(ax.xaxis.get_ticklabels()):
@@ -96,6 +95,7 @@ class EvoAnalytics:
                 label.set_visible(False)
 
         # plt.show()
+        plt.tight_layout()
         plt.savefig('D://fitness.png', dpi=300)
 
         if 'obj1' in df.columns:
