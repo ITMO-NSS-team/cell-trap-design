@@ -1,5 +1,6 @@
 import copy
 import random
+from copy import deepcopy
 from multiprocessing import Pool
 
 import numpy as np
@@ -109,22 +110,30 @@ def initial_pop_random(size: int):
     print('Start init')
     population_new = []
 
-    while len(population_new) < size:
-        # import ray
+    env = GlobalEnv()
+    if env.initial_state is None:
+        while len(population_new) < size:
+            # import ray
 
-        with Pool(NUM_PROC) as p:
-            new_items = p.map(get_pop_worker, [GlobalEnv().domain] * size)
+            with Pool(NUM_PROC) as p:
+                new_items = p.map(get_pop_worker, [GlobalEnv().domain] * size)
 
-        for structure in new_items:
-            is_correct = check_constraints(structure)
-            if is_correct:
-                print(f'Created')
-                population_new.append(structure)
-                if len(population_new) == size:
-                    return population_new
+            for structure in new_items:
+                is_correct = check_constraints(structure)
+                if is_correct:
+                    print(f'Created')
+                    population_new.append(structure)
+                    if len(population_new) == size:
+                        return population_new
 
-                # return structure
-    print('End init')
+                    # return structure
+        print('End init')
+    else:
+        for _ in range(size):
+            if _ > 150:
+                population_new.append(mutation(deepcopy(env.initial_state), 0.9))
+            else:
+                population_new.append(deepcopy(env.initial_state))
     return population_new
 
 

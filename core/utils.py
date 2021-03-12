@@ -19,6 +19,9 @@ class GlobalEnv(object):
     # save both fitness values and evaluated models
     full_save_load = False
 
+    # initial polygon for optimisation start
+    initial_state = None
+
 
 def project_root() -> Path:
     """Returns project root folder."""

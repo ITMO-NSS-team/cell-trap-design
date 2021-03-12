@@ -92,7 +92,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
         outs = [float(_) for _ in outs]
 
         target = float(sum(outs[0:4])) / float(sum(outs[4:7]))
-        if (curl > 30000) or ((width_ratio < 0.25) or (width_ratio > 0.34)):
+        if (curl > 30000) or ((width_ratio < 0.25) or (width_ratio > 0.43)):
             print('Speed common condition violated')
             target = 0
 
