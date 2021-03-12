@@ -68,7 +68,8 @@ class EvoAnalytics:
         sns.boxplot(x=df['pop_num'], y=df['obj0'], palette="Blues")
         plt.show()
 
-        plt.figure(figsize=(20, 10))
-        plt.xticks(rotation=45)
-        sns.boxplot(x=df['pop_num'], y=df['obj1'], palette="Blues")
-        plt.show()
+        if 'obj1' in df.columns:
+            plt.figure(figsize=(20, 10))
+            plt.xticks(rotation=45)
+            sns.boxplot(x=df['pop_num'], y=df['obj1'], palette="Blues")
+            plt.show()

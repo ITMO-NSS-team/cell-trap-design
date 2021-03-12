@@ -53,7 +53,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
                 poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
                 poly_box.append(poly_repr)
 
-            model = client.load(f'{project_root()}/comsol/Comsol2pics_add_curl_curv.mph')
+            model = client.load(f'{project_root()}/comsol/Comsol2pics_add_curl_curv 4 traps 4etenko.mph')
 
             try:
                 model = poly_add(model, poly_box)
@@ -73,7 +73,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
                     model.evaluate('vlct_2'),
                     model.evaluate('vlct_3'),
                     model.evaluate('vlct_4'),
-                    model.evaluate('vlct_5'),
+                    # model.evaluate('vlct_5'),
                     model.evaluate('vlct_side'),
                     model.evaluate('vlct_main')]
         except Exception as ex:
@@ -91,14 +91,14 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
 
         outs = [float(_) for _ in outs]
 
-        target = float(sum(outs[0:5])) / float(sum(outs[5:7]))
+        target = float(sum(outs[0:4])) / float(sum(outs[4:7]))
         if (curl > 30000) or ((width_ratio < 0.25) or (width_ratio > 0.34)):
             print('Speed common condition violated')
             target = 0
 
-        mean_diff = float(np.mean([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]]))
-        if USE_AVG_CONST and any([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 > 5.0 for o in outs[0:5]]):
-            print('Speed equality violated', [abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]])
+        mean_diff = float(np.mean([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]]))
+        if USE_AVG_CONST and any([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]]):
+            print('Speed equality violated', [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]])
             target = 0
 
         if with_vizualization and target > 0:

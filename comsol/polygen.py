@@ -71,14 +71,14 @@ def poly_draw(model, sort=False):
 
     plt.figure()
     plt.scatter(x[U > 0], y[U > 0], c=U[U > 0], cmap=plt.cm.coolwarm)
-    plt.plot(x_up, y_up, linewidth=6, c='black')
-    plt.plot(x_down, y_down, linewidth=6, c='black')
-    plt.plot(x_rumb, y_rumb, linewidth=6, c='black')
-    plt.plot(x_trap_1, y_trap_1, linewidth=6, c='black')
-    plt.plot(x_trap_2, y_trap_2, linewidth=6, c='black')
-    plt.plot(x_trap_3, y_trap_3, linewidth=6, c='black')
-    plt.plot(x_trap_4, y_trap_4, linewidth=6, c='black')
-    plt.plot(x_trap_5, y_trap_5, linewidth=6, c='black')
+    # plt.plot(x_up, y_up, linewidth=6, c='black')
+    # plt.plot(x_down, y_down, linewidth=6, c='black')
+    # plt.plot(x_rumb, y_rumb, linewidth=6, c='black')
+    # plt.plot(x_trap_1, y_trap_1, linewidth=6, c='black')
+    # plt.plot(x_trap_2, y_trap_2, linewidth=6, c='black')
+    # plt.plot(x_trap_3, y_trap_3, linewidth=6, c='black')
+    # plt.plot(x_trap_4, y_trap_4, linewidth=6, c='black')
+    # plt.plot(x_trap_5, y_trap_5, linewidth=6, c='black')
 
     i = 1
     while True:
@@ -110,14 +110,14 @@ def poly_draw(model, sort=False):
     width_ratio = len(U[U > fast_U]) / len(U[U > 0])
 
     target = (model.evaluate('vlct_1') + model.evaluate('vlct_2') + model.evaluate('vlct_3') + model.evaluate(
-        'vlct_4') + model.evaluate('vlct_5')) / (model.evaluate('vlct_main') + model.evaluate('vlct_side'))
+        'vlct_4')) / (model.evaluate('vlct_main') + model.evaluate('vlct_side'))
 
     curv = model.evaluate('curv') / 10 ** 7
 
     curl = model.evaluate('curl')
 
     outs = [model.evaluate('vlct_1'), model.evaluate('vlct_2'),
-            model.evaluate('vlct_3'), model.evaluate('vlct_4'), model.evaluate('vlct_5')]
+            model.evaluate('vlct_3'), model.evaluate('vlct_4')]
     mean_diff = float(np.mean([abs(float(o) / np.mean(outs) - 1) * 100 for o in outs]))
 
     plt.title(
