@@ -4,10 +4,9 @@ from copy import deepcopy
 from multiprocessing import Pool
 
 import numpy as np
-from shapely import affinity
 
 from core.optimisation.constraints import check_constraints
-from core.structure.structure import (Structure, get_random_point, get_random_poly, get_random_structure)
+from core.structure.structure import Structure, get_random_point, get_random_poly, get_random_structure
 from core.utils import GlobalEnv
 
 MAX_ITER = 50000
@@ -81,7 +80,7 @@ def mutation(structure: Structure, rate):
     is_correct = False
 
     min_pol_size = 4
-    changes_num = random.randint(1, 5)
+    changes_num = 1
 
     n_iter = 0
 
@@ -145,10 +144,10 @@ def mutate_worker(args):
 
     polygon_drop_mutation_prob = 0.2
     polygon_add_mutation_prob = 0.2
-    point_drop_mutation_prob = 0.2
+    point_drop_mutation_prob = 0.5
     point_add_mutation_prob = 0.2
-    polygon_rotate_mutation_prob = 0.2
-    polygon_reshape_mutation_prob = 0.2
+    polygon_rotate_mutation_prob = 0.5
+    polygon_reshape_mutation_prob = 0.5
 
     try:
         new_structure = copy.deepcopy(structure)
@@ -167,12 +166,13 @@ def mutate_worker(args):
                 new_structure.polygons.append(new_poly)
             elif random.random() < polygon_rotate_mutation_prob:
                 # if add polygon to structure
-                polygon_to_mutate.rotate(float(random.randint(-180, 180)))
+                angle = float(random.randint(-30, 30))
+                polygon_to_mutate.rotate(angle)
             elif random.random() < polygon_reshape_mutation_prob:
                 # if add polygon to structure
-                affinity.scale(polygon_to_mutate.as_geom(),
-                               max(0.25, float(np.random.normal(1, 0.5, 1)[0])),
-                               max(0.25, float(np.random.normal(1, 0.5, 1)[0])))
+                polygon_to_mutate.resize(
+                    max(0.25, float(np.random.normal(1, 0.5, 1)[0])),
+                    max(0.25, float(np.random.normal(1, 0.5, 1)[0])))
             else:
                 mutate_point_ind = random.randint(0, len(polygon_to_mutate.points) - 1)
                 point_to_mutate = polygon_to_mutate.points[mutate_point_ind]

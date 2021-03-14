@@ -33,8 +33,6 @@ if __name__ == '__main__':
             PolygonPoint(8, 61),
             PolygonPoint(17, 54),
             PolygonPoint(17, 44),
-            PolygonPoint(-3, -17),
-            PolygonPoint(4, 0),
             PolygonPoint(-0, -12),
             PolygonPoint(-16, -32),
             PolygonPoint(-17, -39),

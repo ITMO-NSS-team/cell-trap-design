@@ -71,6 +71,16 @@ class Polygon(object):
         x, y = self.as_geom().exterior.xy
         plt.plot(x, y)
 
+    def resize(self, x_scale, y_scale):
+        geom_polygon = self.as_geom()
+
+        rescaled_geom_polygon = affinity.scale(geom_polygon,
+                                               x_scale, y_scale)
+
+        self.points = [PolygonPoint(x, y) for x, y in
+                       zip(list(rescaled_geom_polygon.exterior.xy[0]),
+                           list(rescaled_geom_polygon.exterior.xy[1]))]
+
     def rotate(self, angle: float):
         geom_polygon = self.as_geom()
 
