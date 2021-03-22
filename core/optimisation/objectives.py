@@ -1,3 +1,5 @@
+import os
+
 from core.optimisation.analytics import EvoAnalytics
 from core.utils import GlobalEnv
 
@@ -13,6 +15,10 @@ def calculate_objectives(population, visualiser=None):
                                     ind.analytics_objectives,
                                     ind.genotype,
                                     'common_dataset', idx)
+
+        if not os.path.exists('./str_tmp'):
+            os.mkdir('./str_tmp')
+        structure.plot(with_border=False, save_path=f'./str_tmp/str_{idx}.png')
 
 
 def calculate_objectives_multi(population, visualiser=None):

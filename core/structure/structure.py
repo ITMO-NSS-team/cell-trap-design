@@ -1,11 +1,11 @@
 import json
-from dataclasses import dataclass
 from random import randint
 from typing import List, Optional
 from uuid import uuid4
 
 import matplotlib.pyplot as plt
 import numpy as np
+from dataclasses import dataclass
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
@@ -46,13 +46,21 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self):
+    def plot(self, with_border=True, save_path=None):
+        fig, ax = plt.subplots()
+
         for poly in self.polygons:
             poly.plot()
-        geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv().domain.allowed_area])
-        x, y = geom_poly_allowed.exterior.xy
-        plt.plot(x, y)
-        plt.show()
+        if with_border:
+            geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv().domain.allowed_area])
+            x, y = geom_poly_allowed.exterior.xy
+            plt.plot(x, y)
+        if save_path:
+            fig.patch.set_visible(False)
+            ax.axis('off')
+            plt.savefig(save_path, dpi=50)
+        else:
+            plt.show()
 
 
 def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=8) -> Structure:

@@ -19,10 +19,8 @@ np.random.seed(10)
 random_dim = 100
 import imageio
 
-img_size = (64, 64)
+img_size = (192, 192)
 gsize = img_size[0] * img_size[1]
-
-from PIL import Image
 
 
 def grayConversion(image):
@@ -33,12 +31,12 @@ def grayConversion(image):
 
 def load_minst_data():
     images = []
-    num_images = 2700
+    num_images = 500
 
     for image_path in glob.glob('D:\\gan\\*.png'):
-        im = Image.open(image_path)
-        im_resized = im.resize(img_size, Image.ANTIALIAS)
-        im_resized.save(image_path, "png")
+        # im = Image.open(image_path)
+        # im_resized = im.resize(img_size, Image.NEAREST)
+        # im_resized.save(image_path, "png")
 
         im = imageio.imread(image_path)
         images.append(grayConversion(np.asarray(im)))
@@ -46,11 +44,12 @@ def load_minst_data():
             break
 
     x_train = np.asarray(images)
-    x_train = np.round((x_train.astype(np.float32) - 127.5) / 127.5).astype(int)
+    x_train = np.round((x_train.astype(np.float32) - 127.5) / 127.5).astype(int) + 1
+    x_train[x_train == 2] = 1
     size_x = images[0].shape[0]
     size_y = images[0].shape[1]
 
-    plt.imshow(x_train[0, ...])
+    plt.imshow(x_train[0, ...], interpolation='nearest')
     plt.show()
     # load the data
     # (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -116,7 +115,7 @@ def get_gan_network(discriminator, random_dim, generator, optimizer):
     return gan
 
 
-def plot_generated_images(epoch, generator, examples=100, dim=(10, 10), figsize=(10, 10)):
+def plot_generated_images(epoch, generator, examples=9, dim=(3, 3), figsize=(20, 20)):
     noise = np.random.normal(0, 1, size=[examples, random_dim])
     generated_images = generator.predict(noise)
     generated_images = generated_images.reshape(examples, img_size[0], img_size[0])
@@ -124,7 +123,7 @@ def plot_generated_images(epoch, generator, examples=100, dim=(10, 10), figsize=
     plt.figure(figsize=figsize)
     for i in range(generated_images.shape[0]):
         plt.subplot(dim[0], dim[1], i + 1)
-        plt.imshow(generated_images[i], interpolation='nearest', cmap='gray_r')
+        plt.imshow(generated_images[i], interpolation='nearest')
         plt.axis('off')
     plt.tight_layout()
     plt.savefig('gan_generated_image_epoch_%d.png' % epoch)
@@ -148,7 +147,7 @@ def train(epochs=1, batch_size=128):
             noise = np.random.normal(0, 1, size=[batch_size, random_dim])
             image_batch = x_train[np.random.randint(0, x_train.shape[0], size=batch_size)]
 
-            # Generate fake MNIST images
+            # Generate fake images
             generated_images = generator.predict(noise)
             X = np.concatenate([image_batch, generated_images])
 
@@ -172,4 +171,4 @@ def train(epochs=1, batch_size=128):
 
 
 if __name__ == '__main__':
-    train(400, 128)
+    train(10000, 128)
