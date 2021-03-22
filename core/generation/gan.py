@@ -11,6 +11,8 @@ from keras.models import Model, Sequential
 from keras.optimizers import Adam
 from tqdm import tqdm
 
+# from PIL import Image
+
 # Let Keras know that we are using tensorflow as our backend engine
 os.environ["KERAS_BACKEND"] = "tensorflow"
 # To make sure that we can reproduce the experiment and get the same results
@@ -31,7 +33,7 @@ def grayConversion(image):
 
 def load_minst_data():
     images = []
-    num_images = 500
+    num_images = 14
 
     for image_path in glob.glob('D:\\gan\\*.png'):
         # im = Image.open(image_path)
@@ -44,8 +46,9 @@ def load_minst_data():
             break
 
     x_train = np.asarray(images)
-    x_train = np.round((x_train.astype(np.float32) - 127.5) / 127.5).astype(int) + 1
-    x_train[x_train == 2] = 1
+    x_train = np.round((x_train.astype(np.float32) - 127.5) / 127.5).astype(int)
+    x_train[x_train >= 1] = 0
+    x_train[x_train <= -1] = 1
     size_x = images[0].shape[0]
     size_y = images[0].shape[1]
 

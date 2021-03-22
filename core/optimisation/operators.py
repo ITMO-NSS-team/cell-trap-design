@@ -112,7 +112,6 @@ def initial_pop_random(size: int):
     env = GlobalEnv()
     if env.initial_state is None:
         while len(population_new) < size:
-            # import ray
 
             with Pool(NUM_PROC) as p:
                 new_items = p.map(get_pop_worker, [GlobalEnv().domain] * size)
@@ -142,12 +141,12 @@ def mutate_worker(args):
     new_env = GlobalEnv()
     new_env.domain = domain
 
-    polygon_drop_mutation_prob = 0.2
-    polygon_add_mutation_prob = 0.2
-    point_drop_mutation_prob = 0.5
-    point_add_mutation_prob = 0.2
-    polygon_rotate_mutation_prob = 0.5
-    polygon_reshape_mutation_prob = 0.5
+    mutation_type = random.choice(['polygon_drop',
+                                   'polygon_add',
+                                   'point_drop',
+                                   'point_add',
+                                   'polygon_rotate',
+                                   'polygon_reshape'])
 
     try:
         new_structure = copy.deepcopy(structure)
@@ -155,20 +154,20 @@ def mutate_worker(args):
         for _ in range(changes_num):
             polygon_to_mutate = new_structure.polygons[random.randint(0, len(new_structure.polygons) - 1)]
 
-            if random.random() < polygon_drop_mutation_prob and len(new_structure.polygons) > 1:
+            if mutation_type == 'polygon_drop' and len(new_structure.polygons) > 1:
                 # if drop polygon from structure
                 new_structure.polygons.remove(polygon_to_mutate)
-            elif random.random() < polygon_add_mutation_prob:
+            elif mutation_type == 'polygon_add':
                 # if add polygon to structure
                 new_poly = get_random_poly(parent_structure=new_structure)
                 if new_poly is None:
                     continue
                 new_structure.polygons.append(new_poly)
-            elif random.random() < polygon_rotate_mutation_prob:
+            elif mutation_type == 'polygon_rotate':
                 # if add polygon to structure
                 angle = float(random.randint(-30, 30))
                 polygon_to_mutate.rotate(angle)
-            elif random.random() < polygon_reshape_mutation_prob:
+            elif mutation_type == 'polygon_reshape':
                 # if add polygon to structure
                 polygon_to_mutate.resize(
                     max(0.25, float(np.random.normal(1, 0.5, 1)[0])),
@@ -176,7 +175,7 @@ def mutate_worker(args):
             else:
                 mutate_point_ind = random.randint(0, len(polygon_to_mutate.points) - 1)
                 point_to_mutate = polygon_to_mutate.points[mutate_point_ind]
-                if (random.random() < point_drop_mutation_prob and
+                if (mutation_type == 'point_drop' and
                         len(polygon_to_mutate.points) > min_pol_size):
                     # if drop point from polygon
                     polygon_to_mutate.points.remove(point_to_mutate)
@@ -186,22 +185,8 @@ def mutate_worker(args):
                     new_point = get_random_point(point_to_mutate, polygon_to_mutate, new_structure)
                     if new_point is None:
                         continue
-                    # domain = GlobalEnv().domain
-                    # params_x = [domain.len_x * 0.05, domain.len_x * 0.025]
-                    # params_y = [domain.len_y * 0.05, domain.len_y * 0.025]
 
-                    # mutation_ratio_x = abs(np.random.normal(params_x[0], params_x[1], 1)[0])
-                    # mutation_ratio_y = abs(np.random.normal(params_y[0], params_y[1], 1)[0])
-
-                    # sign = 1 if random.random() < 0.5 else -1
-
-                    # new_point = copy.deepcopy(point_to_mutate)
-                    # new_point.x += sign * mutation_ratio_x
-                    # new_point.x = round(abs(new_point.x))
-                    # new_point.y += sign * mutation_ratio_y
-                    # new_point.y = round(abs(new_point.y))
-
-                    if random.random() < point_add_mutation_prob:
+                    if mutation_type == 'point_add':
                         if mutate_point_ind + 1 < len(polygon_to_mutate.points):
                             polygon_to_mutate.points.insert(mutate_point_ind + 1, new_point)
                         else:

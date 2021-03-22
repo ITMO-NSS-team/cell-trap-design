@@ -169,8 +169,8 @@ def get_random_point(prev_point: PolygonPoint,
             num_iter -= 1
             # print(num_iter)
             pt = PolygonPoint(
-                min(max(np.random.normal(prev_point.x, domain.len_x * 0.01), domain.min_x + 5), domain.max_x + 5),
-                min(max(np.random.normal(prev_point.y, domain.len_y * 0.01), domain.min_y - 5), domain.max_y - 5))
+                min(max(np.random.normal(prev_point.x, domain.len_x * 0.05), domain.min_x + 5), domain.max_x + 5),
+                min(max(np.random.normal(prev_point.y, domain.len_y * 0.05), domain.min_y - 5), domain.max_y - 5))
             is_correct_point = GlobalEnv().domain.contains(pt)
 
             if is_correct_point and parent_poly and len(parent_poly.points) > 0 and num_iter > MAX_ITER / 2:
