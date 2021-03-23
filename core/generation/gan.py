@@ -21,7 +21,7 @@ np.random.seed(10)
 random_dim = 100
 import imageio
 
-img_size = (192, 192)
+img_size = (240, 320)  # (192, 192)
 gsize = img_size[0] * img_size[1]
 
 
@@ -33,7 +33,7 @@ def grayConversion(image):
 
 def load_minst_data():
     images = []
-    num_images = 14
+    num_images = 2400
 
     for image_path in glob.glob('D:\\gan\\*.png'):
         # im = Image.open(image_path)
@@ -121,7 +121,7 @@ def get_gan_network(discriminator, random_dim, generator, optimizer):
 def plot_generated_images(epoch, generator, examples=9, dim=(3, 3), figsize=(20, 20)):
     noise = np.random.normal(0, 1, size=[examples, random_dim])
     generated_images = generator.predict(noise)
-    generated_images = generated_images.reshape(examples, img_size[0], img_size[0])
+    generated_images = generated_images.reshape(examples, img_size[0], img_size[1])
 
     plt.figure(figsize=figsize)
     for i in range(generated_images.shape[0]):
