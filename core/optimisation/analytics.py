@@ -73,3 +73,62 @@ class EvoAnalytics:
             plt.xticks(rotation=45)
             sns.boxplot(x=df['pop_num'], y=df['obj1'], palette="Blues")
             plt.show()
+
+    @staticmethod
+    def create_boxplot2():
+        f = f'HistoryFiles/history_{EvoAnalytics.run_id}.csv'
+
+        df = pd.read_csv(f, header=0, sep="\s*,\s*")
+        df['obj0'] = -df['obj0']
+
+        df = df.loc[df['pop_num'] % 2 == 0]
+
+        plt.clf()
+        plt.figure(figsize=(20, 7))
+        # plt.xticks(rotation=45)
+
+        fsize = 16
+        plt.rcParams["font.size"] = fsize
+        plt.tick_params(labelsize=fsize)
+        plt.rc('xtick', labelsize=fsize)
+        plt.rc('ytick', labelsize=fsize)
+        plt.xticks(rotation=0)
+        plt.yticks(rotation=90)
+
+        ax = sns.boxplot(x=df['pop_num'], y=df['obj0'], color='white',
+                         # width=1.0,
+                         fliersize=0)
+
+        # iterate over boxes
+        for i, box in enumerate(ax.artists):
+            box.set_edgecolor('black')
+            box.set_facecolor('white')
+
+            # iterate over whiskers and median lines
+            for j in range(6 * i, 6 * (i + 1)):
+                ax.lines[j].set_color('black')
+
+        plt.ylabel('Fitness (flow ratio)', fontsize=fsize)
+        plt.xlabel('Generations, #', fontsize=fsize, rotation=0)
+
+        # plt.hlines(y=max(df['obj0']), xmin=min(df['pop_num']), xmax=max(df['pop_num']),
+        #           linestyles='dashed')
+
+        # plt.text(min(df['obj0']), max(df['obj0']) * 0.95,
+        #         f"Best found topology with fitness {round(max(df['obj0']), 4)}",
+        #         size=fsize, rotation=0)
+
+        ax = plt.gca()
+        for index, label in enumerate(ax.xaxis.get_ticklabels()):
+            if index % 10 != 0:
+                label.set_visible(False)
+
+        # plt.show()
+        plt.tight_layout()
+        plt.savefig('D://fitness.png', dpi=300)
+
+        if 'obj1' in df.columns:
+            plt.figure(figsize=(20, 10))
+            plt.xticks(rotation=45)
+            sns.boxplot(x=df['pop_num'], y=df['obj1'], palette="Blues")
+            plt.show()

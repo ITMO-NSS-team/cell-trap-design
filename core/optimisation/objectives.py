@@ -18,7 +18,7 @@ def calculate_objectives(population, visualiser=None):
 
         if not os.path.exists('./str_tmp'):
             os.mkdir('./str_tmp')
-        structure.plot(with_border=False, save_path=f'./str_tmp/str_{idx}.png')
+        # structure.plot(with_border=False, save_path=f'./str_tmp/str_{idx}.png')
 
 
 def calculate_objectives_multi(population, visualiser=None):
