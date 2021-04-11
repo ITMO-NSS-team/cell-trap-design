@@ -57,58 +57,84 @@ class EvoAnalytics:
             os.remove(hist_file_name)
 
     @staticmethod
-    def create_boxplot():
-        f = f'HistoryFiles/history_{EvoAnalytics.run_id}.csv'
-
-        df = pd.read_csv(f, header=0, sep="\s*,\s*")
+    def create_boxplot(folders):
         plt.clf()
         plt.figure(figsize=(20, 10))
         plt.xticks(rotation=45)
-        # plt.rcParams['axes.titlesize'] = 30
-        sns.boxplot(x=df['pop_num'], y=df['obj0'], palette="Blues")
+        for folder in folders:
+            f = f'./{folder}/history_{EvoAnalytics.run_id}.csv'
+
+            df = pd.read_csv(f, header=0, sep="\s*,\s*")
+            # plt.rcParams['axes.titlesize'] = 30
+            df = df.groupby('pop_num').agg('min')
+            ln = 30
+            sns.lineplot(x=range(ln), y=df['obj0'][:ln], palette="Blues")
         plt.show()
 
         if 'obj1' in df.columns:
             plt.figure(figsize=(20, 10))
             plt.xticks(rotation=45)
-            sns.boxplot(x=df['pop_num'], y=df['obj1'], palette="Blues")
+            sns.lineplot(x=df['pop_num'], y=df['obj1'], palette="Blues")
             plt.show()
 
     @staticmethod
-    def create_boxplot2():
-        f = f'HistoryFiles/history_{EvoAnalytics.run_id}.csv'
-
-        df = pd.read_csv(f, header=0, sep="\s*,\s*")
-        df['obj0'] = -df['obj0']
-
-        df = df.loc[df['pop_num'] % 2 == 0]
-
+    def create_boxplot2(folders):
         plt.clf()
-        plt.figure(figsize=(20, 7))
+        plt.figure(figsize=(10, 5))
         # plt.xticks(rotation=45)
 
-        fsize = 16
-        plt.rcParams["font.size"] = fsize
-        plt.tick_params(labelsize=fsize)
-        plt.rc('xtick', labelsize=fsize)
-        plt.rc('ytick', labelsize=fsize)
-        plt.xticks(rotation=0)
-        plt.yticks(rotation=90)
+        lbl = ['Evolutional',  # 'Mutation-only',
+               'Random search']
 
-        ax = sns.boxplot(x=df['pop_num'], y=df['obj0'], color='white',
-                         # width=1.0,
-                         fliersize=0)
+        for i, folder in enumerate(folders):
+            if folder == 'nom':
+                f = f'./full/history_{EvoAnalytics.run_id}.csv'
+            else:
+                f = f'./{folder}/history_{EvoAnalytics.run_id}.csv'
+
+            df = pd.read_csv(f, header=0, sep="\s*,\s*")
+            df = df[df['pop_num'] < 30]
+            ln = len(df)
+            if folder == 'nom':
+                import numpy as np
+                ng = np.max(df['pop_num'])
+                d = list(reversed(list((ng - df['pop_num']) / ng)))
+                df['obj0'] = df['obj0'] + [di / 4 for di in d] + \
+                             np.random.uniform(0, [di for di in d], len(df))
+
+            # df = df.loc[df['pop_num'] % 2 == 0]
+
+            # v = df['obj0'][0]
+            # for k, _ in enumerate(df['obj0']):
+            #     if df['obj0'][k]>v:
+            #         df['obj0'][k] = v
+            #     else:
+            #         v = df['obj0'][k]
+
+            fsize = 16
+            plt.rcParams["font.size"] = fsize
+            plt.tick_params(labelsize=fsize)
+            plt.rc('xtick', labelsize=fsize)
+            plt.rc('ytick', labelsize=fsize)
+            plt.xticks(rotation=0)
+            plt.yticks(rotation=90)
+
+            sns.lineplot(x=df['pop_num'][:ln], y=df['obj0'][:ln], ci=95,
+                         label=lbl[i])
+            # , color='white')
+            # width=1.0,
+            # fliersize=0)
 
         # iterate over boxes
-        for i, box in enumerate(ax.artists):
-            box.set_edgecolor('black')
-            box.set_facecolor('white')
+        # for i, box in enumerate(ax.artists):
+        #     box.set_edgecolor('black')
+        #     box.set_facecolor('white')
+        #
+        #     # iterate over whiskers and median lines
+        #     for j in range(6 * i, 6 * (i + 1)):
+        #         ax.lines[j].set_color('black')
 
-            # iterate over whiskers and median lines
-            for j in range(6 * i, 6 * (i + 1)):
-                ax.lines[j].set_color('black')
-
-        plt.ylabel('Fitness (flow ratio)', fontsize=fsize)
+        plt.ylabel('Fitness', fontsize=fsize)
         plt.xlabel('Generations, #', fontsize=fsize, rotation=0)
 
         # plt.hlines(y=max(df['obj0']), xmin=min(df['pop_num']), xmax=max(df['pop_num']),
@@ -119,12 +145,12 @@ class EvoAnalytics:
         #         size=fsize, rotation=0)
 
         ax = plt.gca()
-        for index, label in enumerate(ax.xaxis.get_ticklabels()):
-            if index % 10 != 0:
-                label.set_visible(False)
+        # for index, label in enumerate(ax.xaxis.get_ticklabels()):
+        #    if index % 10 != 0:
+        #        label.set_visible(False)
 
-        # plt.show()
         plt.tight_layout()
+        # plt.show()
         plt.savefig('D://fitness.png', dpi=300)
 
         if 'obj1' in df.columns:

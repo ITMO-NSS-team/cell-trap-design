@@ -92,8 +92,8 @@ class GA:
             p1 = selected[pair_index]
             p2 = selected[pair_index + 1]
 
-            # child_gen = #p1.genotype#
-            child_gen = self.crossover(p1.genotype, p2.genotype, self.params.crossover_rate)
+            child_gen = p1.genotype
+            # child_gen = self.crossover(p1.genotype, p2.genotype, self.params.crossover_rate)
             child_gen = self.mutation(child_gen, self.params.mutation_rate)
             if str(child_gen) != str(p1.genotype) and str(child_gen) != str(p2.genotype):
                 child = GA.Individ(genotype=copy.deepcopy(child_gen))
