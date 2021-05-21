@@ -1,11 +1,11 @@
 import json
-from dataclasses import dataclass
 from random import randint
 from typing import List, Optional
 from uuid import uuid4
 
 import matplotlib.pyplot as plt
 import numpy as np
+from dataclasses import dataclass
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
@@ -169,7 +169,7 @@ def get_random_point(prev_point: PolygonPoint,
                 # check then new point is not near existing points
                 # if len(parent_poly.points) > 2:
                 #    nearest_pts = nearest_points(pt.as_geom(), parent_poly.as_geom())
-                #    is_correct_point = nearest_pts[0].distance(nearest_pts[1]) > domain.len_x * 0.05
+                #    is_correct_point = nearest_pts[0].distance(nearest_pts[1]) > domains.len_x * 0.05
                 # else:
                 is_correct_point = all([pt.as_geom().distance(poly_pt.as_geom()) > domain.len_x * 0.1
                                         for poly_pt in parent_poly.points])

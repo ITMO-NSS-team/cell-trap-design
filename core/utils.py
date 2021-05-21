@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable
+from typing import Callable, List, Union
 
 from core.structure.domain import Domain
 
@@ -10,8 +10,8 @@ class GlobalEnv(object):
             cls.instance = super(GlobalEnv, cls).__new__(cls)
         return cls.instance
 
-    # description of domain for optimisation
-    domain: Domain = None
+    # description of domains for optimisation
+    domain: Union[Domain, List[Domain]] = None
     # function to evaluate the model of environment
     model_func: Callable
     # link to COMSOL client (if necessary)

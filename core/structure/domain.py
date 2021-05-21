@@ -1,16 +1,21 @@
+from typing import Optional, List
+
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 
 from core.structure.polygon import PolygonPoint
 
 
 class Domain:
-    allowed_area = [(-125, 100),
-                    (-75, 155),
-                    (15, 155),
-                    (40, 90),
-                    (-10, -130),
-                    (-10, -155),
-                    (-125, -155)]
+    def __init__(self, allowed_area: Optional[List] = None):
+        if allowed_area is None:
+            allowed_area = [(-125, 100),
+                            (-75, 155),
+                            (15, 155),
+                            (40, 90),
+                            (-10, -130),
+                            (-10, -155),
+                            (-125, -155)]
+        self.allowed_area = allowed_area
 
     @property
     def min_x(self):

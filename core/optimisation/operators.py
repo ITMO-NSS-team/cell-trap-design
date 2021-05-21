@@ -13,13 +13,16 @@ MAX_ITER = 50000
 NUM_PROC = 12
 
 
-def crossover(s1: Structure, s2: Structure, rate=0.4):
+def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
     random_val = random.random()
     if random_val >= rate or len(s1.polygons) == 1 or len(s2.polygons) == 1:
         if random.random() > 0.5:
             return s1
         else:
             return s2
+
+    if domain is None:
+        domain = GlobalEnv().domain
 
     is_correct = False
     n_iter = 0
@@ -31,7 +34,7 @@ def crossover(s1: Structure, s2: Structure, rate=0.4):
         print(n_iter)
         with Pool(NUM_PROC) as p:
             new_items = p.map(crossover_worker,
-                              [[s1, s2, GlobalEnv().domain] for _ in range(NUM_PROC)])
+                              [[s1, s2, domain] for _ in range(NUM_PROC)])
 
         for structure in new_items:
             if structure is not None:
@@ -71,11 +74,14 @@ def crossover_worker(args):
     return new_structure
 
 
-def mutation(structure: Structure, rate):
+def mutation(structure: Structure, rate, domain=None):
     random_val = random.random()
 
     if random_val > rate:
         return structure
+
+    if domain is None:
+        domain = GlobalEnv().domain
 
     is_correct = False
 
@@ -93,7 +99,7 @@ def mutation(structure: Structure, rate):
         with Pool(NUM_PROC) as p:
             new_items = \
                 p.map(mutate_worker,
-                      [[new_structure, changes_num, min_pol_size, GlobalEnv().domain] for _ in range(NUM_PROC)])
+                      [[new_structure, changes_num, min_pol_size, domain] for _ in range(NUM_PROC)])
 
         for structure in new_items:
             if structure is not None:
@@ -105,17 +111,21 @@ def mutation(structure: Structure, rate):
     return new_structure
 
 
-def initial_pop_random(size: int):
+def initial_pop_random(size: int, domain=None):
     print('Start init')
     population_new = []
 
     env = GlobalEnv()
+
+    if domain is None:
+        domain = GlobalEnv().domain
+
     if env.initial_state is None:
         while len(population_new) < size:
             # import ray
 
             with Pool(NUM_PROC) as p:
-                new_items = p.map(get_pop_worker, [GlobalEnv().domain] * size)
+                new_items = p.map(get_pop_worker, [domain] * size)
 
             for structure in new_items:
                 is_correct = check_constraints(structure)
@@ -186,9 +196,9 @@ def mutate_worker(args):
                     new_point = get_random_point(point_to_mutate, polygon_to_mutate, new_structure)
                     if new_point is None:
                         continue
-                    # domain = GlobalEnv().domain
-                    # params_x = [domain.len_x * 0.05, domain.len_x * 0.025]
-                    # params_y = [domain.len_y * 0.05, domain.len_y * 0.025]
+                    # domains = GlobalEnv().domains
+                    # params_x = [domains.len_x * 0.05, domains.len_x * 0.025]
+                    # params_y = [domains.len_y * 0.05, domains.len_y * 0.025]
 
                     # mutation_ratio_x = abs(np.random.normal(params_x[0], params_x[1], 1)[0])
                     # mutation_ratio_y = abs(np.random.normal(params_y[0], params_y[1], 1)[0])
