@@ -25,6 +25,8 @@ class CoGA:
         self.calculate_objectives = calculate_objectives
         self.operators = evolutionary_operators
 
+        self._pops = []
+
         self.__init_operators()
         self.__init_populations()
 
@@ -32,8 +34,6 @@ class CoGA:
         self.greedy_heuristic = greedy_heuristic
 
         self.generation_number = 0
-
-        self._pops = []
 
     def __init_operators(self):
         self.init_population = self.operators.init_population

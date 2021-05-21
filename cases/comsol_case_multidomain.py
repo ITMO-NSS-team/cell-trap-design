@@ -40,7 +40,7 @@ if __name__ == '__main__':
     global_env.comsol_client = mph.Client(cores=12)
     global_env.full_save_load = False
 
-    optimization_results = optimize(domains, max_gens=300, pop_size=300, mode='single_obj')
+    optimization_results = optimize(domains, max_gens=4, pop_size=4, mode='single_obj')
 
     for result in optimization_results:
         print(result.objectives)

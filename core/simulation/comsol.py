@@ -39,6 +39,7 @@ def poly_add(model, polygons):
 
 
 def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float, str]:
+    return 3, 1, '0'
     gc.collect()
     client = GlobalEnv().comsol_client
     target, mean_diff, idx = _load_fitness(structure)

@@ -46,10 +46,13 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self):
+    def plot(self, domain=None):
+        if domain is None:
+            domain = GlobalEnv().domain
+
         for poly in self.polygons:
             poly.plot()
-        geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv().domain.allowed_area])
+        geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
         x, y = geom_poly_allowed.exterior.xy
         plt.plot(x, y)
         plt.show()

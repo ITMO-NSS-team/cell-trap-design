@@ -8,8 +8,10 @@ from core.utils import GlobalEnv
 MIN_DIST = 15
 
 
-def out_of_bound(structure: 'Structure') -> bool:
-    geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in GlobalEnv().domain.allowed_area])
+def out_of_bound(structure: 'Structure', domain=None) -> bool:
+    if domain is None:
+        domain = GlobalEnv().domain
+    geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
 
     for poly in structure.polygons:
         for pt in poly.points:

@@ -4,7 +4,9 @@ from core.optimisation.GA.DefaultGA import DefaultGA
 from core.optimisation.SPEA2.DefaultSPEA2 import DefaultSPEA2
 from core.optimisation.SPEA2.Operators import default_operators
 from core.optimisation.coGA.coGA import DefaultCoGA
-from core.optimisation.objectives import calculate_objectives, calculate_objectives_multi
+from core.optimisation.objectives import (calculate_objectives,
+                                          calculate_objectives_multi,
+                                          calculate_objectives_for_coevo)
 from core.structure.domain import Domain
 from core.utils import GlobalEnv
 
@@ -19,7 +21,7 @@ def optimize(domain: Union[Domain, List[Domain]], max_gens=300, pop_size=300, mo
                                     mutation_value_rate=[])
         _, best = DefaultCoGA(
             params=params,
-            calculate_objectives=calculate_objectives,
+            calculate_objectives=calculate_objectives_for_coevo,
             evolutionary_operators=operators).solution(verbose=False)
 
         results = [best]

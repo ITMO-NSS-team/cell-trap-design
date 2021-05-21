@@ -38,7 +38,7 @@ def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
 
         for structure in new_items:
             if structure is not None:
-                is_correct = check_constraints(structure)
+                is_correct = check_constraints(structure, domain)
                 if is_correct:
                     new_structure = structure
                     break
@@ -67,7 +67,7 @@ def crossover_worker(args):
 
     new_structure.polygons = result
 
-    is_correct = check_constraints(new_structure, is_lightweight=True)
+    is_correct = check_constraints(new_structure, is_lightweight=True, domain=domain)
     if not is_correct:
         return None
 
@@ -103,7 +103,7 @@ def mutation(structure: Structure, rate, domain=None):
 
         for structure in new_items:
             if structure is not None:
-                is_correct = check_constraints(structure)
+                is_correct = check_constraints(structure, domain=domain)
                 if is_correct:
                     new_structure = structure
                     break
@@ -128,7 +128,7 @@ def initial_pop_random(size: int, domain=None):
                 new_items = p.map(get_pop_worker, [domain] * size)
 
             for structure in new_items:
-                is_correct = check_constraints(structure)
+                is_correct = check_constraints(structure, domain=domain)
                 if is_correct:
                     print(f'Created')
                     population_new.append(structure)
@@ -219,7 +219,7 @@ def mutate_worker(args):
                     else:
                         polygon_to_mutate.points[mutate_point_ind] = new_point
 
-        is_correct = check_constraints(new_structure, is_lightweight=True)
+        is_correct = check_constraints(new_structure, is_lightweight=True, domain=domain)
         if not is_correct:
             return None
         return new_structure
@@ -229,7 +229,7 @@ def mutate_worker(args):
 
 
 def get_pop_worker(domain):
-    structure_size = random.randint(2, 4)
+    structure_size = random.randint(1, 2)
     print(f'Try to create size {structure_size}')
 
     new_env = GlobalEnv()
@@ -238,8 +238,8 @@ def get_pop_worker(domain):
     is_correct = False
     while not is_correct:
         structure = get_random_structure(min_pols_num=structure_size, max_pols_num=structure_size,
-                                         min_pol_size=5, max_pol_size=10)
-        is_correct = check_constraints(structure, is_lightweight=True)
+                                         min_pol_size=3, max_pol_size=6)
+        is_correct = check_constraints(structure, is_lightweight=True, domain=domain)
         if is_correct:
             print(f'Created, size {structure_size}')
             return structure
