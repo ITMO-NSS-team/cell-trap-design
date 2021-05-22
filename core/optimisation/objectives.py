@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from core.optimisation.analytics import EvoAnalytics
 from core.utils import GlobalEnv
 
@@ -31,16 +33,19 @@ def calculate_objectives_multi(population, visualiser=None):
 def calculate_objectives_for_coevo(population, visualiser=None):
     model_func = GlobalEnv().model_func
     structures = []
-    for pop in population:
-        structure = None
-        for ind_id, ind in enumerate(pop):
-            if structure == None:
-                structure = ind.genotype.polygons
+    for ind_id in range(len(population[0])):
+        combined_structure = None
+        for pop in population:
+            ind = pop[ind_id]
+            if combined_structure == None:
+                combined_structure = deepcopy(ind.genotype)
             else:
-                structure.polygons.extend(ind.genotype.polygons)
-        structures.append(structure)
+                combined_structure.polygons.extend(deepcopy(ind.genotype.polygons))
+
+        structures.append(combined_structure)
 
     for i, structure in enumerate(structures):
+        structure.plot(domain=GlobalEnv().domain)
         effectiveness, speed_diff, idx = model_func(structure)
         for pop in population:
             ind = pop[i]

@@ -1,11 +1,11 @@
 import json
+from dataclasses import dataclass
 from random import randint
 from typing import List, Optional
 from uuid import uuid4
 
 import matplotlib.pyplot as plt
 import numpy as np
-from dataclasses import dataclass
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
@@ -52,20 +52,31 @@ class Structure:
 
         for poly in self.polygons:
             poly.plot()
-        geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
-        x, y = geom_poly_allowed.exterior.xy
-        plt.plot(x, y)
+        if isinstance(domain, list):
+            for d in domain:
+                geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in d.allowed_area])
+                x, y = geom_poly_allowed.exterior.xy
+                plt.plot(x, y)
+        else:
+            geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
+            x, y = geom_poly_allowed.exterior.xy
+            plt.plot(x, y)
         plt.show()
 
 
-def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=8) -> Structure:
+def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=8, domain=None) -> Structure:
     structure = Structure(polygons=[])
-
+    if domain is None:
+        current_domain = GlobalEnv().domain
+    else:
+        current_domain = domain
     num_pols = randint(min_pols_num, max_pols_num)
     is_large = num_pols == 1
 
     for _ in range(num_pols):
-        polygon = get_random_poly(min_pol_size, max_pol_size, is_large=is_large, parent_structure=structure)
+        polygon = get_random_poly(min_pol_size, max_pol_size,
+                                  is_large=is_large, parent_structure=structure,
+                                  domain=current_domain)
         if len(polygon.points) > 2:
             structure.polygons.append(polygon)
         else:
@@ -76,15 +87,18 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
 
 
 def get_random_poly(min_pol_size=5, max_pol_size=15, is_large=False,
-                    parent_structure: Optional[Structure] = None) -> Optional[Polygon]:
+                    parent_structure: Optional[Structure] = None,
+                    domain=None) -> Optional[Polygon]:
     try:
-        domain = GlobalEnv().domain
-
+        if domain is None:
+            current_domain = GlobalEnv().domain
+        else:
+            current_domain = domain
         polygon = Polygon(polygon_id=str(uuid4), points=[])
         num_points = randint(min_pol_size, max_pol_size)
 
-        centroid = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
-                                np.random.uniform(low=domain.min_y, high=domain.max_y))
+        centroid = PolygonPoint(np.random.uniform(low=current_domain.min_x, high=current_domain.max_x),
+                                np.random.uniform(low=current_domain.min_y, high=current_domain.max_y))
 
         # set centroids
         if parent_structure is not None:
@@ -93,12 +107,12 @@ def get_random_poly(min_pol_size=5, max_pol_size=15, is_large=False,
             num_iter = 5000
             while not is_correct_centroid and num_iter > 0:
                 num_iter -= 1
-                y_coord = np.random.uniform(low=domain.min_y, high=domain.max_y)
+                y_coord = np.random.uniform(low=current_domain.min_y, high=current_domain.max_y)
                 if y_coord > -50:
                     # TODO remove workaround
-                    x_coord = np.random.uniform(low=domain.min_x, high=domain.max_x)
+                    x_coord = np.random.uniform(low=current_domain.min_x, high=current_domain.max_x)
                 else:
-                    x_coord = np.random.uniform(low=domain.min_x, high=-45)
+                    x_coord = np.random.uniform(low=current_domain.min_x, high=-45)
 
                 centroid = PolygonPoint(x_coord,
                                         y_coord)
@@ -112,10 +126,10 @@ def get_random_poly(min_pol_size=5, max_pol_size=15, is_large=False,
         prev_point = centroid
         for _ in range(num_points):
             if is_large:
-                point = PolygonPoint(np.random.uniform(low=domain.min_x, high=domain.max_x),
-                                     np.random.uniform(low=domain.min_y, high=domain.max_y))
+                point = PolygonPoint(np.random.uniform(low=current_domain.min_x, high=current_domain.max_x),
+                                     np.random.uniform(low=current_domain.min_y, high=current_domain.max_y))
             else:
-                point = get_random_point(prev_point)
+                point = get_random_point(prev_point, domain=current_domain)
 
                 if parent_structure is not None:
                     is_correct_point = False
@@ -124,7 +138,8 @@ def get_random_poly(min_pol_size=5, max_pol_size=15, is_large=False,
                         iter_num -= 1
 
                         point = get_random_point(prev_point, polygon,
-                                                 parent_structure=parent_structure)
+                                                 parent_structure=parent_structure,
+                                                 domain=current_domain)
                         if point is None:
                             iter_num = 0
                             continue
@@ -153,8 +168,13 @@ def get_random_poly(min_pol_size=5, max_pol_size=15, is_large=False,
 
 def get_random_point(prev_point: PolygonPoint,
                      parent_poly: Optional[Polygon] = None,
-                     parent_structure: Optional[Structure] = None) -> Optional[PolygonPoint]:
-    domain = GlobalEnv().domain
+                     parent_structure: Optional[Structure] = None,
+                     domain=None) -> Optional[PolygonPoint]:
+    if domain is not None:
+        current_domain = domain
+    else:
+        current_domain = GlobalEnv().domain
+
     is_correct_point = False
     pt = None
     MAX_ITER = 5000
@@ -162,28 +182,34 @@ def get_random_point(prev_point: PolygonPoint,
     while not is_correct_point and num_iter > 0:
         try:
             num_iter -= 1
-            # print(num_iter)
+            print('get rp', num_iter)
             pt = PolygonPoint(
-                min(max(np.random.normal(prev_point.x, domain.len_x * 0.01), domain.min_x + 5), domain.max_x + 5),
-                min(max(np.random.normal(prev_point.y, domain.len_y * 0.01), domain.min_y - 5), domain.max_y - 5))
-            is_correct_point = GlobalEnv().domain.contains(pt)
+                min(max(np.random.normal(prev_point.x, current_domain.len_x * 0.05),
+                        current_domain.min_x + current_domain.len_x * 0.05),
+                    current_domain.max_x - current_domain.len_x * 0.05),
+                min(max(np.random.normal(prev_point.y, current_domain.len_y * 0.05),
+                        current_domain.min_y + current_domain.len_y * 0.05),
+                    current_domain.max_y - current_domain.len_y * 0.05))
+            is_correct_point = current_domain.contains(pt)
 
-            if is_correct_point and parent_poly and len(parent_poly.points) > 0 and num_iter > MAX_ITER / 2:
+            if (is_correct_point and parent_poly and
+                    len(parent_poly.points) > 0 and num_iter > MAX_ITER / 2):
                 # check then new point is not near existing points
                 # if len(parent_poly.points) > 2:
                 #    nearest_pts = nearest_points(pt.as_geom(), parent_poly.as_geom())
                 #    is_correct_point = nearest_pts[0].distance(nearest_pts[1]) > domains.len_x * 0.05
                 # else:
-                is_correct_point = all([pt.as_geom().distance(poly_pt.as_geom()) > domain.len_x * 0.1
+                is_correct_point = all([pt.as_geom().distance(poly_pt.as_geom()) > current_domain.len_x * 0.1
                                         for poly_pt in parent_poly.points])
 
             if is_correct_point and parent_structure and len(parent_structure.polygons) > 0:
                 # check then new point is not near existing polygons
                 for poly_from_structure in parent_structure.polygons:
-                    nearest_pts = nearest_points(pt.as_geom(), poly_from_structure.as_geom())
-                    is_correct_point = nearest_pts[0].distance(nearest_pts[1]) > MIN_DIST
-                    if not is_correct_point:
-                        break
+                    if poly_from_structure is not parent_poly:
+                        _, nearest_pt = nearest_points(pt.as_geom(), poly_from_structure.as_geom().boundary)
+                        is_correct_point = pt.as_geom().distance(nearest_pt) > MIN_DIST
+                        if not is_correct_point:
+                            break
         except Exception as ex:
             print(ex)
 

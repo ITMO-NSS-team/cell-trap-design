@@ -31,7 +31,7 @@ def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
 
     while not is_correct and n_iter < MAX_ITER:
         n_iter += 1
-        print(n_iter)
+        print('cross', n_iter)
         with Pool(NUM_PROC) as p:
             new_items = p.map(crossover_worker,
                               [[s1, s2, domain] for _ in range(NUM_PROC)])
@@ -48,8 +48,8 @@ def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
 
 def crossover_worker(args):
     s1, s2, domain = args[0], args[1], args[2]
-    new_env = GlobalEnv()
-    new_env.domain = domain
+    # new_env = GlobalEnv()
+    # new_env.domain = domain
 
     new_structure = copy.deepcopy(s1)
 
@@ -94,7 +94,7 @@ def mutation(structure: Structure, rate, domain=None):
 
     while not is_correct and n_iter < MAX_ITER:
         n_iter += 1
-        print(n_iter)
+        print('mut', n_iter)
 
         with Pool(NUM_PROC) as p:
             new_items = \
@@ -149,8 +149,8 @@ def initial_pop_random(size: int, domain=None):
 def mutate_worker(args):
     structure, changes_num, min_pol_size, domain = args[0], args[1], args[2], args[3]
 
-    new_env = GlobalEnv()
-    new_env.domain = domain
+    # new_env = GlobalEnv()
+    # new_env.domain = domain
 
     polygon_drop_mutation_prob = 0.2
     polygon_add_mutation_prob = 0.2
@@ -170,7 +170,7 @@ def mutate_worker(args):
                 new_structure.polygons.remove(polygon_to_mutate)
             elif random.random() < polygon_add_mutation_prob:
                 # if add polygon to structure
-                new_poly = get_random_poly(parent_structure=new_structure)
+                new_poly = get_random_poly(parent_structure=new_structure, domain=domain)
                 if new_poly is None:
                     continue
                 new_structure.polygons.append(new_poly)
@@ -193,7 +193,8 @@ def mutate_worker(args):
                 else:
                     # if change point in polygon
 
-                    new_point = get_random_point(point_to_mutate, polygon_to_mutate, new_structure)
+                    new_point = get_random_point(point_to_mutate, polygon_to_mutate,
+                                                 new_structure, domain=domain)
                     if new_point is None:
                         continue
                     # domains = GlobalEnv().domains
@@ -229,16 +230,16 @@ def mutate_worker(args):
 
 
 def get_pop_worker(domain):
-    structure_size = random.randint(1, 2)
+    structure_size = 1  # random.randint(1, 2)
     print(f'Try to create size {structure_size}')
 
-    new_env = GlobalEnv()
-    new_env.domain = domain
+    # new_env = GlobalEnv()
+    # new_env.domain = domain
 
     is_correct = False
     while not is_correct:
         structure = get_random_structure(min_pols_num=structure_size, max_pols_num=structure_size,
-                                         min_pol_size=3, max_pol_size=6)
+                                         min_pol_size=3, max_pol_size=6, domain=domain)
         is_correct = check_constraints(structure, is_lightweight=True, domain=domain)
         if is_correct:
             print(f'Created, size {structure_size}')

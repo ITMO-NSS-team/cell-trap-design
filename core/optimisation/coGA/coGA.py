@@ -39,9 +39,9 @@ class DefaultCoGA(CoGA):
 
             self.fitness()
 
-            if len(set([_.fitness for _ in self._pop])) != \
-                    len(([_.fitness for _ in self._pop])):
-                print("!")
+            # if len(set([_.fitness for _ in self._pop])) != \
+            #        len(([_.fitness for _ in self._pop])):
+            #    print("!")
 
             for i, pop in enumerate(self._pops):
                 selected = self.tournament_selection(pop=pop)

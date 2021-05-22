@@ -5,8 +5,9 @@ from core.utils import GlobalEnv
 
 def check_constraints(structure: Structure, is_lightweight: bool = False, domain=None) -> bool:
     if domain is None:
-        domain = GlobalEnv().domain
-
+        current_domain = GlobalEnv().domain
+    else:
+        current_domain = domain
     try:
         if any([(poly is None or
                  len(poly.points) == 0 or
@@ -16,7 +17,7 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
             return False
 
         # structure.plot()
-        structurally_correct = (not (out_of_bound(structure, domain) or
+        structurally_correct = (not (out_of_bound(structure, current_domain) or
                                      too_close(structure) or
                                      self_intersection(structure)))
 
