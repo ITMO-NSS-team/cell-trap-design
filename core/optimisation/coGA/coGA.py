@@ -1,5 +1,6 @@
 import os
 import time
+from copy import deepcopy
 
 from core.optimisation.analytics import EvoAnalytics
 from core.optimisation.coGA.coGaBase import CoGA
@@ -8,7 +9,6 @@ from core.optimisation.coGA.coGaBase import CoGA
 class DefaultCoGA(CoGA):
 
     def solution(self, verbose=True, **kwargs):
-        extended_debug = verbose
         self.generation_number = 0
 
         self.fitness()
@@ -31,7 +31,7 @@ class DefaultCoGA(CoGA):
                 pop = [un_pop.add(str(ind.genotype)) or ind for ind in pop
                        if str(ind.genotype) not in un_pop]
 
-                pop.extend(self.reproduce(pop, self.domains[i]))
+                pop.extend(self.reproduce(deepcopy(pop), deepcopy(self.domains[i])))
 
                 for individ in pop:
                     individ.population_number = self.generation_number

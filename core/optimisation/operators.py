@@ -10,7 +10,7 @@ from core.structure.structure import Structure, get_random_point, get_random_pol
 from core.utils import GlobalEnv
 
 MAX_ITER = 50000
-NUM_PROC = 12
+NUM_PROC = 1
 
 
 def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
@@ -32,9 +32,12 @@ def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
     while not is_correct and n_iter < MAX_ITER:
         n_iter += 1
         print('cross', n_iter)
-        with Pool(NUM_PROC) as p:
-            new_items = p.map(crossover_worker,
-                              [[s1, s2, domain] for _ in range(NUM_PROC)])
+        if NUM_PROC > 1:
+            with Pool(NUM_PROC) as p:
+                new_items = p.map(crossover_worker,
+                                  [[s1, s2, domain] for _ in range(NUM_PROC)])
+        else:
+            new_items = [crossover_worker([s1, s2, domain]) for _ in range(NUM_PROC)]
 
         for structure in new_items:
             if structure is not None:
@@ -96,10 +99,13 @@ def mutation(structure: Structure, rate, domain=None):
         n_iter += 1
         print('mut', n_iter)
 
-        with Pool(NUM_PROC) as p:
-            new_items = \
-                p.map(mutate_worker,
-                      [[new_structure, changes_num, min_pol_size, domain] for _ in range(NUM_PROC)])
+        if NUM_PROC > 1:
+            with Pool(NUM_PROC) as p:
+                new_items = \
+                    p.map(mutate_worker,
+                          [[new_structure, changes_num, min_pol_size, domain] for _ in range(NUM_PROC)])
+        else:
+            new_items = [mutate_worker([new_structure, changes_num, min_pol_size, domain]) for _ in range(NUM_PROC)]
 
         for structure in new_items:
             if structure is not None:
@@ -123,9 +129,11 @@ def initial_pop_random(size: int, domain=None):
     if env.initial_state is None:
         while len(population_new) < size:
             # import ray
-
-            with Pool(NUM_PROC) as p:
-                new_items = p.map(get_pop_worker, [domain] * size)
+            if NUM_PROC > 1:
+                with Pool(NUM_PROC) as p:
+                    new_items = p.map(get_pop_worker, [domain] * size)
+            else:
+                new_items = [get_pop_worker(domain) for _ in range(size)]
 
             for structure in new_items:
                 is_correct = check_constraints(structure, domain=domain)
@@ -192,6 +200,10 @@ def mutate_worker(args):
                     polygon_to_mutate.points.remove(point_to_mutate)
                 else:
                     # if change point in polygon
+
+                    if point_to_mutate is not None and not domain.contains(point_to_mutate):
+                        print("!!!!!!!!!!!!!!1")
+                        raise ValueError('Wrong prev_point')
 
                     new_point = get_random_point(point_to_mutate, polygon_to_mutate,
                                                  new_structure, domain=domain)
