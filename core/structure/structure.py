@@ -194,12 +194,12 @@ def get_random_point(prev_point: PolygonPoint,
     while not is_correct_point and num_iter > 0:
         try:
             num_iter -= 1
-            print('get rp', MAX_ITER - num_iter)
+            # print('get rp', MAX_ITER - num_iter)
             pt = PolygonPoint(
-                min(max(np.random.normal(prev_point.x, current_domain.len_x * 0.1),
+                min(max(np.random.normal(prev_point.x, current_domain.len_x * 0.05),
                         current_domain.min_x + current_domain.len_x * 0.05),
                     current_domain.max_x - current_domain.len_x * 0.05),
-                min(max(np.random.normal(prev_point.y, current_domain.len_y * 0.1),
+                min(max(np.random.normal(prev_point.y, current_domain.len_y * 0.05),
                         current_domain.min_y + current_domain.len_y * 0.05),
                     current_domain.max_y - current_domain.len_y * 0.05))
             is_correct_point = current_domain.contains(pt)

@@ -39,7 +39,7 @@ def poly_add(model, polygons):
 
 
 def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float, str]:
-    return 3, 1, '0'
+    # return 3, 1, '0'
     gc.collect()
     client = GlobalEnv().comsol_client
     target, mean_diff, idx = _load_fitness(structure)
@@ -54,7 +54,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
                 poly_repr.append(' '.join([str(pt.y) for pt in pol.points]))
                 poly_box.append(poly_repr)
 
-            model = client.load(f'{project_root()}/comsol/Comsol2pics_add_curl_curv 4 traps 4etenko.mph')
+            model = client.load(f'{project_root()}/comsol/ML_add_curl_curv_May21_out.mph')
 
             try:
                 model = poly_add(model, poly_box)
