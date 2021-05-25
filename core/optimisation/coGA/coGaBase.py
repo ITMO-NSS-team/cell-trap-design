@@ -104,7 +104,10 @@ class CoGA:
             p2 = selected[pair_index + 1]
 
             child_gen = self.crossover(p1.genotype, p2.genotype, self.params.crossover_rate, domain=domain)
+            # child_gen = postprocess(child_gen, domain)
             child_gen = self.mutation(child_gen, self.params.mutation_rate, domain=domain)
+            # child_gen = postprocess(child_gen, domain)
+
             if str(child_gen) != str(p1.genotype) and str(child_gen) != str(p2.genotype):
                 child = CoGA.Individ(genotype=copy.deepcopy(child_gen))
                 child.generation_number = self.generation_number

@@ -23,11 +23,11 @@ def out_of_bound(structure: 'Structure', domain=None) -> bool:
 
 
 def too_close(structure: 'Structure') -> bool:
-    is_self_intersection = any(
+    is_too_close = any(
         [any([_pairwise_dist(poly_1, poly_2) < MIN_DIST for
               poly_2 in structure.polygons]) for poly_1
          in structure.polygons])
-    return is_self_intersection
+    return is_too_close
 
 
 def _pairwise_dist(poly_1: Polygon, poly_2: Polygon):

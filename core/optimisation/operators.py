@@ -5,6 +5,7 @@ from multiprocessing import Pool
 
 import numpy as np
 
+from core.algs.postproc import postprocess
 from core.optimisation.constraints import check_constraints
 from core.structure.structure import Structure, get_random_point, get_random_poly, get_random_structure
 from core.utils import GlobalEnv
@@ -41,10 +42,10 @@ def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
 
         for structure in new_items:
             if structure is not None:
-                is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
-                if is_correct:
-                    new_structure = structure
-                    break
+                # is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
+                # if is_correct:
+                new_structure = structure
+                break
 
     return new_structure
 
@@ -70,6 +71,7 @@ def crossover_worker(args):
 
     new_structure.polygons = result
 
+    new_structure = postprocess(new_structure, domain)
     is_correct = check_constraints(new_structure, is_lightweight=True, domain=domain)
     if not is_correct:
         return None
@@ -109,10 +111,10 @@ def mutation(structure: Structure, rate, domain=None):
 
         for structure in new_items:
             if structure is not None:
-                is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
-                if is_correct:
-                    new_structure = structure
-                    break
+                #       is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
+                #       if is_correct:
+                new_structure = structure
+                break
 
     return new_structure
 
@@ -136,14 +138,13 @@ def initial_pop_random(size: int, domain=None):
                 new_items = [get_pop_worker(domain) for _ in range(size)]
 
             for structure in new_items:
-                is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
-                if is_correct:
-                    print(f'Created')
-                    population_new.append(structure)
-                    if len(population_new) == size:
-                        return population_new
-
-                    # return structure
+                #     structure = postprocess(structure, domain)
+                #     is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
+                #     if is_correct:
+                #         print(f'Created')
+                population_new.append(structure)
+                if len(population_new) == size:
+                    return population_new
         print('End init')
     else:
         for _ in range(size):
@@ -232,6 +233,7 @@ def mutate_worker(args):
                     else:
                         polygon_to_mutate.points[mutate_point_ind] = new_point
 
+        new_structure = postprocess(new_structure, domain)
         is_correct = check_constraints(new_structure, is_lightweight=True, domain=domain)
         if not is_correct:
             return None
@@ -252,6 +254,7 @@ def get_pop_worker(domain):
     while not is_correct:
         structure = get_random_structure(min_pols_num=structure_size, max_pols_num=structure_size,
                                          min_pol_size=3, max_pol_size=6, domain=domain)
+        structure = postprocess(structure, domain)
         is_correct = check_constraints(structure, is_lightweight=True, domain=domain)
         if is_correct:
             print(f'Created, size {structure_size}')

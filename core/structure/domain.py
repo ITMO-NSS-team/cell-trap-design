@@ -49,3 +49,8 @@ class Domain:
         geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in self.allowed_area])
         geom_pt = GeomPoint(point.x, point.y)
         return geom_poly_allowed.contains(geom_pt)
+
+    def as_geom(self):
+        if self.allowed_area is None or len(self.allowed_area) <= 2:
+            raise ValueError('Not enough points for domain')
+        return GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in self.allowed_area])
