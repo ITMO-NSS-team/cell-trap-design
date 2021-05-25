@@ -1,11 +1,11 @@
 import json
-from dataclasses import dataclass
 from random import randint
 from typing import List, Optional
 from uuid import uuid4
 
 import matplotlib.pyplot as plt
 import numpy as np
+from dataclasses import dataclass
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
@@ -70,6 +70,10 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
         current_domain = GlobalEnv().domain
     else:
         current_domain = domain
+
+    max_pols_num = min(max_pols_num, domain.max_poly_num)
+    min_pols_num = min(min_pols_num, domain.max_poly_num)
+
     num_pols = randint(min_pols_num, max_pols_num)
     is_large = num_pols == 1
 

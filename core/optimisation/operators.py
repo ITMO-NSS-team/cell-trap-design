@@ -41,7 +41,7 @@ def crossover(s1: Structure, s2: Structure, rate=0.4, domain=None):
 
         for structure in new_items:
             if structure is not None:
-                is_correct = check_constraints(structure, domain)
+                is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
                 if is_correct:
                     new_structure = structure
                     break
@@ -109,7 +109,7 @@ def mutation(structure: Structure, rate, domain=None):
 
         for structure in new_items:
             if structure is not None:
-                is_correct = check_constraints(structure, domain=domain)
+                is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
                 if is_correct:
                     new_structure = structure
                     break
@@ -136,7 +136,7 @@ def initial_pop_random(size: int, domain=None):
                 new_items = [get_pop_worker(domain) for _ in range(size)]
 
             for structure in new_items:
-                is_correct = check_constraints(structure, domain=domain)
+                is_correct = check_constraints(structure, domain=domain, is_lightweight=True)
                 if is_correct:
                     print(f'Created')
                     population_new.append(structure)

@@ -16,7 +16,7 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
             print('Wrong structure')
             return False
 
-        # structure.plot()
+            # structure.plot()
         structurally_correct = (not (out_of_bound(structure, current_domain) or
                                      too_close(structure) or
                                      self_intersection(structure)))
@@ -26,8 +26,10 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
             model_func = GlobalEnv().model_func
             obj, _, _ = model_func(structure)
             return -obj < 0
-        else:
-            print('Constraint violated')
+
+        if not structurally_correct:
+            print(f'Constraint violated in {current_domain.name}')
+            return False
     except Exception as ex:
         print(ex)
         return False

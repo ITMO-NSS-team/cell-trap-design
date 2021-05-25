@@ -41,6 +41,8 @@ def poly_add(model, polygons):
 def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float, str]:
     # return 3, 1, '0'
     gc.collect()
+    print("____COMSOL____")
+    # structure.plot()
     client = GlobalEnv().comsol_client
     target, mean_diff, idx = _load_fitness(structure)
     if target is None or GlobalEnv().full_save_load:
@@ -74,7 +76,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
                     model.evaluate('vlct_2'),
                     model.evaluate('vlct_3'),
                     model.evaluate('vlct_4'),
-                    # model.evaluate('vlct_5'),
+                    model.evaluate('vlct_5'),
                     model.evaluate('vlct_side'),
                     model.evaluate('vlct_main')]
         except Exception as ex:
@@ -92,8 +94,8 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
 
         outs = [float(_) for _ in outs]
 
-        target = float(sum(outs[0:4])) / float(sum(outs[4:7]))
-        if (curl > 30000) or ((width_ratio < 0.25) or (width_ratio > 0.43)):
+        target = float(sum(outs[0:5])) / float(sum(outs[5:8]))
+        if (curl > 25000) or (curv < 1.2):  # ((width_ratio < 0.6) or (width_ratio > 0.8)):
             print('Speed common condition violated')
             target = 0
 
@@ -102,7 +104,7 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
             print('Speed equality violated', [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]])
             target = 0
 
-        if with_vizualization and target > 0:
+        if with_vizualization:  # and target > 0:
             poly_draw(model)
 
             if not os.path.exists('./tmp'):

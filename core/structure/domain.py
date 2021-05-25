@@ -6,7 +6,8 @@ from core.structure.polygon import PolygonPoint
 
 
 class Domain:
-    def __init__(self, name='main', allowed_area: Optional[List] = None):
+    def __init__(self, name='main', allowed_area: Optional[List] = None,
+                 max_poly_num=4, min_dist=15):
         self.name = name
         if allowed_area is None:
             allowed_area = [(-125, 100),
@@ -17,6 +18,8 @@ class Domain:
                             (-10, -155),
                             (-125, -155)]
         self.allowed_area = allowed_area
+        self.max_poly_num = max_poly_num
+        self.min_dist = min_dist
 
     @property
     def min_x(self):
