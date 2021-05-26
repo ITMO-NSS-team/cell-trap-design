@@ -26,14 +26,14 @@ def postprocess(structure: Structure, domain: Domain):
 
 def _correct_wrong_point(poly: Polygon, domain: Domain):
     for point in poly.points:
-        point.x = max(point.x, domain.min_x)
-        point.y = max(point.y, domain.min_y)
-        point.x = min(point.x, domain.max_x)
-        point.y = min(point.y, domain.max_y)
+        point.x = max(point.x, domain.min_x + domain.len_x * 0.05)
+        point.y = max(point.y, domain.min_y + domain.len_y * 0.05)
+        point.x = min(point.x, domain.max_x + domain.len_x * 0.05)
+        point.y = min(point.y, domain.max_y + domain.len_y * 0.05)
         if not domain.contains(point):
             _, nearest_correct_position = \
                 nearest_points(point.as_geom(),
-                               domain.as_geom().boundary)
+                               domain.as_geom())
             point.x = nearest_correct_position.x
             point.y = nearest_correct_position.y
     return poly
@@ -44,7 +44,8 @@ def _correct_self_intersection(poly: Polygon):
     convex = poly.as_geom().convex_hull
     if isinstance(convex, ShapelyPolygon):
         poly.points = []
-        for convex_pt in list(convex.exterior.coords.xy):
+        for convex_pt in [(x, y) for x, y in zip(convex.exterior.coords.xy[0],
+                                                 convex.exterior.coords.xy[1])]:
             poly.points.append(GeomPoint(convex_pt[0], convex_pt[1]))
     return poly
 

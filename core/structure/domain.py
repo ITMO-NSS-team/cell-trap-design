@@ -23,19 +23,19 @@ class Domain:
 
     @property
     def min_x(self):
-        return min(p[0] for p in self.allowed_area) + 15
+        return min(p[0] for p in self.allowed_area) + self.min_dist
 
     @property
     def max_x(self):
-        return max(p[0] for p in self.allowed_area) - 15
+        return max(p[0] for p in self.allowed_area) - self.min_dist
 
     @property
     def min_y(self):
-        return min(p[1] for p in self.allowed_area) + 15
+        return min(p[1] for p in self.allowed_area) + self.min_dist
 
     @property
     def max_y(self):
-        return max(p[1] for p in self.allowed_area) - 15
+        return max(p[1] for p in self.allowed_area) - self.min_dist
 
     @property
     def len_x(self):

@@ -253,7 +253,7 @@ def get_pop_worker(domain):
     is_correct = False
     while not is_correct:
         structure = get_random_structure(min_pols_num=structure_size, max_pols_num=structure_size,
-                                         min_pol_size=3, max_pol_size=6, domain=domain)
+                                         min_pol_size=4, max_pol_size=7, domain=domain)
         structure = postprocess(structure, domain)
         is_correct = check_constraints(structure, is_lightweight=True, domain=domain)
         if is_correct:
