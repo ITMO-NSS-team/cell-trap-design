@@ -240,6 +240,8 @@ def mutate_worker(args):
         return new_structure
     except Exception as ex:
         print(f'Mutation error: {ex}')
+        import traceback
+        print(traceback.format_exc())
         return None
 
 

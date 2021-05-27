@@ -39,7 +39,7 @@ def poly_add(model, polygons):
 
 
 def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float, str]:
-    # return 3, 1, '0'
+    return 3, 1, '0'
     gc.collect()
     print("____COMSOL____")
     # structure.plot()
@@ -95,13 +95,13 @@ def execute(structure: Structure, with_vizualization=True) -> Tuple[float, float
         outs = [float(_) for _ in outs]
 
         target = float(sum(outs[0:5])) / float(sum(outs[5:8]))
-        if (curl > 25000) or (curv < 1.2):  # ((width_ratio < 0.6) or (width_ratio > 0.8)):
-            print('Speed common condition violated')
-            target = 0
+        # if (curl > 25000) or (curv < 1.2):  # ((width_ratio < 0.6) or (width_ratio > 0.8)):
+        #    print(f'Speed common condition violated: {curl}, {curv}')
+        #    target = 0
 
-        mean_diff = float(np.mean([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]]))
-        if USE_AVG_CONST and any([abs(float(o) / np.mean(outs[0:4]) - 1) * 100 > 5.0 for o in outs[0:4]]):
-            print('Speed equality violated', [abs(float(o) / np.mean(outs[0:4]) - 1) * 100 for o in outs[0:4]])
+        mean_diff = float(np.mean([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]]))
+        if USE_AVG_CONST and any([abs(float(o) / np.mean(outs[0:5]) - 1) * 100 > 33.0 for o in outs[0:5]]):
+            print('Speed equality violated', [abs(float(o) / np.mean(outs[0:5]) - 1) * 100 for o in outs[0:5]])
             target = 0
 
         if with_vizualization:  # and target > 0:

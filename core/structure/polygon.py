@@ -1,8 +1,8 @@
-from dataclasses import dataclass
 from math import sqrt
 from typing import List
 
 import matplotlib.pyplot as plt
+from dataclasses import dataclass
 from shapely import affinity
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 
@@ -63,8 +63,8 @@ class Polygon(object):
         return total_length
 
     def as_geom(self):
-        if self.points is None or len(self.points) <= 2:
-            raise ValueError('Not enough point for polygon')
+        # if self.points is None or len(self.points) <= 2:
+        #    raise ValueError('Not enough point for polygon')
         return GeomPolygon([GeomPoint(pt.x, pt.y) for pt in self.points])
 
     def plot(self):

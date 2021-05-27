@@ -46,7 +46,7 @@ class Structure:
     def size(self):
         return sum([len(p.points) for p in self.polygons])
 
-    def plot(self, domain=None):
+    def plot(self, domain=None, title=None):
         if domain is None:
             domain = GlobalEnv().domain
 
@@ -61,6 +61,8 @@ class Structure:
             geom_poly_allowed = GeomPolygon([GeomPoint(pt[0], pt[1]) for pt in domain.allowed_area])
             x, y = geom_poly_allowed.exterior.xy
             plt.plot(x, y)
+        if title:
+            plt.title(title)
         plt.show()
 
 
@@ -174,6 +176,8 @@ def get_random_poly(min_pol_size=5, max_pol_size=10, is_large=False,
         # plt.show()
     except Exception as ex:
         print(ex)
+        import traceback
+        print(traceback.format_exc())
         return None
     return polygon
 
@@ -228,6 +232,8 @@ def get_random_point(prev_point: PolygonPoint,
                         if not is_correct_point:
                             break
         except Exception as ex:
+            import traceback
+            print(traceback.format_exc())
             print(ex)
 
     if num_iter == 0:

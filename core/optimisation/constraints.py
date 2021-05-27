@@ -1,4 +1,4 @@
-from core.structure.geometry import out_of_bound, self_intersection, too_close
+from core.algs.postproc import postprocess
 from core.structure.structure import Structure
 from core.utils import GlobalEnv
 
@@ -16,10 +16,13 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
             print('Wrong structure')
             return False
 
-            # structure.plot()
-        structurally_correct = (not (out_of_bound(structure, current_domain) or
-                                     too_close(structure) or
-                                     self_intersection(structure)))
+        # final postprocessing
+        structure = postprocess(structure, current_domain)
+
+        cts = []  # out_of_bound(structure, current_domain),
+        # too_close(structure, current_domain)]
+        # self_intersection(structure)]
+        structurally_correct = not any(cts)
 
         if structurally_correct and not is_lightweight:
             print('Check heavy constraint')
@@ -28,10 +31,14 @@ def check_constraints(structure: Structure, is_lightweight: bool = False, domain
             return -obj < 0
 
         if not structurally_correct:
-            print(f'Constraint violated in {current_domain.name}')
+            print(f'Constraint violated in {current_domain.name}: {cts}')
+            structure.plot(current_domain,
+                           title=f'Constraint violated in {current_domain.name}: {cts}')
             return False
     except Exception as ex:
         print(ex)
+        import traceback
+        print(traceback.format_exc())
         return False
 
     return structurally_correct

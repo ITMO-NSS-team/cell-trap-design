@@ -22,9 +22,9 @@ def out_of_bound(structure: 'Structure', domain=None) -> bool:
     return False
 
 
-def too_close(structure: 'Structure') -> bool:
+def too_close(structure: 'Structure', domain) -> bool:
     is_too_close = any(
-        [any([_pairwise_dist(poly_1, poly_2) < MIN_DIST for
+        [any([_pairwise_dist(poly_1, poly_2) < domain.min_dist for
               poly_2 in structure.polygons]) for poly_1
          in structure.polygons])
     return is_too_close
