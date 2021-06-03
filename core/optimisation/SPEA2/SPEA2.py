@@ -3,6 +3,8 @@ import random
 from math import sqrt
 from operator import itemgetter
 
+import core.optimisation.operators.crossover
+import core.optimisation.operators.mutation
 from core.optimisation.SPEA2.RawFitness import raw_fitness
 
 
@@ -32,8 +34,8 @@ class SPEA2:
 
     def __init_operators(self):
         self.init_population = self.operators.init_population
-        self.crossover = self.operators.crossover
-        self.mutation = self.operators.mutation
+        self.crossover = core.optimisation.operators.crossover.crossover
+        self.mutation = core.optimisation.operators.mutation.mutation
 
     def __init_populations(self):
 

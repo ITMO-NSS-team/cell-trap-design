@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 
@@ -6,8 +6,8 @@ from core.structure.polygon import PolygonPoint
 
 
 class Domain:
-    def __init__(self, name='main', allowed_area: Optional[List] = None,
-                 max_poly_num=4, min_dist=15):
+    def __init__(self, name='main', allowed_area: Optional[List[Tuple]] = None,
+                 max_poly_num=4, min_dist=15, fixed_points: Optional[List[Tuple]] = None):
         self.name = name
         if allowed_area is None:
             allowed_area = [(-125, 100),
@@ -17,9 +17,13 @@ class Domain:
                             (-10, -130),
                             (-10, -155),
                             (-125, -155)]
+        else:
+            allowed_area = [(int(round(p[0], 0)), int(round(p[1], 0))) for p in allowed_area]
         self.allowed_area = allowed_area
         self.max_poly_num = max_poly_num
         self.min_dist = min_dist
+        self.fixed_points = [PolygonPoint(p[0], p[1]) for p in fixed_points] \
+            if fixed_points is not None else []
 
     @property
     def min_x(self):

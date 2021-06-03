@@ -1,8 +1,8 @@
+from dataclasses import dataclass
 from math import sqrt
 from typing import List
 
 import matplotlib.pyplot as plt
-from dataclasses import dataclass
 from shapely import affinity
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 
@@ -70,6 +70,10 @@ class Polygon(object):
     def plot(self):
         x, y = self.as_geom().exterior.xy
         plt.plot(x, y)
+
+    def show(self):
+        self.plot()
+        plt.show()
 
     def resize(self, x_scale, y_scale):
         geom_polygon = self.as_geom()

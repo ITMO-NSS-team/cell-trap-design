@@ -1,8 +1,4 @@
-from core.optimisation.operators import (
-    initial_pop_random,
-    crossover,
-    mutation
-)
+from core.optimisation.operators import (crossover, initial, mutation)
 
 
 class EvoOperators:
@@ -13,4 +9,6 @@ class EvoOperators:
 
 
 def default_operators():
-    return EvoOperators(init_population=initial_pop_random, crossover=crossover, mutation=mutation)
+    return EvoOperators(init_population=initial.initial_pop_random,
+                        crossover=crossover.crossover,
+                        mutation=mutation.mutation)

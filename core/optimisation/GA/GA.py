@@ -4,6 +4,9 @@ from random import randint
 
 import numpy as np
 
+import core.optimisation.operators.crossover
+import core.optimisation.operators.mutation
+
 
 class GA:
     def __init__(self, params, calculate_objectives, evolutionary_operators,
@@ -28,8 +31,8 @@ class GA:
 
     def __init_operators(self):
         self.init_population = self.operators.init_population
-        self.crossover = self.operators.crossover
-        self.mutation = self.operators.mutation
+        self.crossover = core.optimisation.operators.crossover.crossover
+        self.mutation = core.optimisation.operators.mutation.mutation
 
     def __init_populations(self):
 

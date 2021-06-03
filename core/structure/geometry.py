@@ -7,6 +7,8 @@ from core.utils import GlobalEnv
 
 MIN_DIST = 15
 
+min_dist_from_boundary = 1
+
 
 def out_of_bound(structure: 'Structure', domain=None) -> bool:
     if domain is None:
@@ -16,7 +18,8 @@ def out_of_bound(structure: 'Structure', domain=None) -> bool:
     for poly in structure.polygons:
         for pt in poly.points:
             geom_pt = GeomPoint(pt.x, pt.y)
-            if not geom_poly_allowed.contains(geom_pt):
+            if not geom_poly_allowed.contains(geom_pt) and not \
+                    geom_poly_allowed.distance(geom_pt) < min_dist_from_boundary:
                 return True
 
     return False

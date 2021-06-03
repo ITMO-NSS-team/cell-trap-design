@@ -1,11 +1,12 @@
 import json
+from copy import deepcopy
+from dataclasses import dataclass
 from random import randint
 from typing import List, Optional
 from uuid import uuid4
 
 import matplotlib.pyplot as plt
 import numpy as np
-from dataclasses import dataclass
 from shapely.geometry import Point as GeomPoint, Polygon as GeomPolygon
 from shapely.ops import nearest_points
 
@@ -66,7 +67,7 @@ class Structure:
         plt.show()
 
 
-def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=8, domain=None) -> Structure:
+def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol_size=5, domain=None) -> Structure:
     structure = Structure(polygons=[])
     if domain is None:
         current_domain = GlobalEnv().domain
@@ -87,12 +88,11 @@ def get_random_structure(min_pols_num=2, max_pols_num=4, min_pol_size=3, max_pol
             structure.polygons.append(polygon)
         else:
             print('Wrong polygon')
-        # structure.plot()
 
     return structure
 
 
-def get_random_poly(min_pol_size=5, max_pol_size=10, is_large=False,
+def get_random_poly(min_pol_size=3, max_pol_size=5, is_large=False,
                     parent_structure: Optional[Structure] = None,
                     domain=None) -> Optional[Polygon]:
     try:
@@ -101,7 +101,10 @@ def get_random_poly(min_pol_size=5, max_pol_size=10, is_large=False,
         else:
             current_domain = domain
         polygon = Polygon(polygon_id=str(uuid4()), points=[])
-        num_points = randint(min_pol_size, max_pol_size)
+
+        polygon.points.extend(deepcopy(current_domain.fixed_points))
+
+        num_points = randint(min_pol_size, max_pol_size - len(current_domain.fixed_points))
 
         # default centroid
         centroid = PolygonPoint(np.random.uniform(low=current_domain.min_x, high=current_domain.max_x),
@@ -116,11 +119,8 @@ def get_random_poly(min_pol_size=5, max_pol_size=10, is_large=False,
                 num_iter -= 1
                 y_coord = np.random.uniform(low=current_domain.min_y,
                                             high=current_domain.max_y)
-                # if y_coord > -50:
-                #    # TODO remove workaround
-                #    x_coord = np.random.uniform(low=current_domain.min_x, high=current_domain.max_x)
-                # else:
-                x_coord = np.random.uniform(low=current_domain.min_x, high=-current_domain.max_x)
+                x_coord = np.random.uniform(low=current_domain.min_x,
+                                            high=current_domain.max_x)
 
                 centroid = PolygonPoint(x_coord, y_coord)
                 is_correct_centroid = (current_domain.contains(centroid) and

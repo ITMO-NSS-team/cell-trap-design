@@ -1,9 +1,8 @@
-import random
-
 import mph
 import numpy as np
 import scipy
 
+import random
 from core.optimisation.analytics import EvoAnalytics
 from core.optimisation.optimize import optimize
 from core.simulation.comsol import execute as execute_comsol
@@ -22,22 +21,28 @@ if __name__ == '__main__':
                                    (-9.7, -75.4), (3.7, -87.3)], max_poly_num=4, min_dist=1)
     domain2 = Domain(name='P1',
                      allowed_area=[(13.62, -64.735), (13.62, -49.53), (30.575, -49.53), (30.575, -64.735)],
-                     max_poly_num=1, min_dist=1)
+                     max_poly_num=1, min_dist=0,
+                     fixed_points=[(30.575, -49.53), (30.575, -64.735)])
     domain3 = Domain(name='P2',
                      allowed_area=[(24.515, -40.105), (24.515, -27.130), (30.572, -27.130), (30.572, -40.105)],
-                     max_poly_num=1, min_dist=1)
+                     max_poly_num=1, min_dist=0,
+                     fixed_points=[(30.572, -27.130), (30.572, -40.105)])
     domain4 = Domain(name='P3',
                      allowed_area=[(36.355, -17.59), (36.355, -4.605), (43.195, -4.605), (43.195, -17.590)],
-                     max_poly_num=1, min_dist=1)
+                     max_poly_num=1, min_dist=0,
+                     fixed_points=[(43.195, -4.605), (43.195, -17.590)])
     domain5 = Domain(name='P4',
                      allowed_area=[(48.315, 4.875), (48.315, 18.020), (57.078, 18.020), (57.078, 4.875)],
-                     min_dist=1)
+                     min_dist=0,
+                     fixed_points=[(57.078, 18.020), (57.078, 4.875)])
     domain6 = Domain(name='P5',
                      allowed_area=[(58.975, 27.38), (58.975, 43.020), (68.26, 43.02), (68.26, 27.38)],
-                     max_poly_num=1, min_dist=1)
+                     max_poly_num=1, min_dist=0,
+                     fixed_points=[(68.26, 43.02), (68.26, 27.38)])
     domain7 = Domain(name='P6',
                      allowed_area=[(46.6, 52.5), (46.6, 82.5), (68.26, 82.50), (68.26, 52.50)],
-                     max_poly_num=1, min_dist=1)
+                     max_poly_num=1, min_dist=0,
+                     fixed_points=[(68.26, 82.50), (68.26, 52.50)])
 
     domains = [domain1, domain2, domain3, domain4, domain5, domain6, domain7]
 
@@ -47,7 +52,7 @@ if __name__ == '__main__':
     global_env.comsol_client = mph.Client(cores=1)
     global_env.full_save_load = False
 
-    optimization_results = optimize(domains, max_gens=4, pop_size=4, mode='single_obj')
+    optimization_results = optimize(domains, max_gens=100, pop_size=100, mode='single_obj')
 
     for result in optimization_results:
         print(result.objectives)
